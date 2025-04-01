@@ -1,26 +1,14 @@
-import js from "@eslint/js";
-import prettier from "eslint-plugin-prettier";
-import prettierConfig from "eslint-config-prettier";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { FlatCompat } from "@eslint/eslintrc";
 
-export default [
-  js.configs.recommended,
-  prettierConfig,
-  {
-    files: ["**/*.js", "**/*.jsx"],
-    languageOptions: {
-      sourceType: "module",
-      ecmaVersion: "latest",
-      globals: {
-        browser: true,
-        node: true,
-        console: true  // ✅ Add this line to allow `console.log`
-      }
-    },
-    plugins: {
-      prettier
-    },
-    rules: {
-      "prettier/prettier": ["error", { singleQuote: true, semi: false }]
-    }
-  }
-];
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+const eslintConfig = [...compat.extends("next/core-web-vitals")];
+
+export default eslintConfig;

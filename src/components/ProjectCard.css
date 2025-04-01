@@ -1,0 +1,39 @@
+.project-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background-color: #f9f9f9;
+  transition: box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+.project-card__title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #111; /* 🔥 Changed from gray to dark black */
+}
+
+.project-card__tech {
+  font-style: italic;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.project-card__desc {
+  color: #333;
+}
+.project-card__github {
+  display: inline-block;
+  margin-top: 1rem;
+  text-decoration: none;
+  color: #0070f3;
+  font-weight: bold;
+}
+
+.project-card__github:hover {
+  text-decoration: underline;
+}

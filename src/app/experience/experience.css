@@ -1,0 +1,34 @@
+.experience-page {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.experience-heading {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #beb1b1;
+}
+
+.experience-entry {
+  margin-bottom: 2rem;
+}
+
+.experience-entry h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.experience-entry p {
+  margin: 0.5rem 0 1rem;
+  font-weight: 500;
+}
+
+.experience-entry ul {
+  padding-left: 1.25rem;
+}
+
+.experience-entry ul li {
+  margin-bottom: 0.5rem;
+}
