@@ -3,6 +3,8 @@ import cors from 'cors'
 import projectRoutes from './routes/projects.js'
 import experienceRoutes from './routes/experience.js'
 import contactRoutes from './routes/contact.js'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5001
