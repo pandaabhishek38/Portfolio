@@ -4,14 +4,13 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 const router = express.Router()
 
-// GET all projects
 router.get('/', async (req, res) => {
   try {
-    const projects = await prisma.project.findMany()
-    res.json(projects)
+    const contactItems = await prisma.contactItem.findMany()
+    res.json(contactItems)
   } catch (err) {
-    console.error('❌ Error fetching projects:', err)
-    res.status(500).json({ error: 'Failed to fetch projects' })
+    console.error('❌ Failed to fetch contact info:', err)
+    res.status(500).json({ error: 'Unable to load contact info' })
   }
 })
 

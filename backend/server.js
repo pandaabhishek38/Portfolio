@@ -3,6 +3,8 @@ import cors from 'cors'
 import projectRoutes from './routes/projects.js'
 import experienceRoutes from './routes/experience.js'
 import contactRoutes from './routes/contact.js'
+import contactInfoRoutes from './routes/contactinfo.js'
+
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -19,6 +21,7 @@ app.get('/', (req, res) => {
 app.use('/api/projects', projectRoutes)
 app.use('/api/experience', experienceRoutes)
 app.use('/api/contact', contactRoutes)
+app.use('/api/contact-info', contactInfoRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`)

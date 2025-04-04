@@ -1,5 +1,8 @@
 import express from 'express'
 import nodemailer from 'nodemailer'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 const router = express.Router()
 
@@ -42,14 +45,18 @@ router.post('/', async (req, res) => {
       `,
     })
 
-    console.log('📩 Email sent successfully:', { name, email, message })
+    await prisma.contactMessage.create({
+      data: { name, email, message },
+    })
+
+    console.log('📩 Email sent and 💾 message saved to DB:', { name, email })
 
     res
       .status(200)
       .json({ success: true, message: 'Message received and email sent!' })
   } catch (err) {
-    console.error('❌ Email send failed:', err)
-    res.status(500).json({ error: 'Failed to send email.' })
+    console.error('❌ Email send or DB save failed:', err)
+    res.status(500).json({ error: 'Failed to send email or save message.' })
   }
 })
 
