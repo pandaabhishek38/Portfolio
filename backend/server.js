@@ -8,6 +8,9 @@ import authRoutes from './routes/auth.js'
 import adminProjectRoutes from './routes/adminProjects.js'
 import adminExperienceRoutes from './routes/adminExperience.js'
 import adminContactInfoRoutes from './routes/admin/contactinfo.js'
+import adminMessageRoutes from './routes/admin/messages.js'
+import aboutRoutes from './routes/about.js'
+import adminAboutRoutes from './routes/admin/about.js'
 
 import dotenv from 'dotenv'
 dotenv.config()
@@ -30,6 +33,9 @@ app.use('/api/auth', authRoutes)
 app.use('/api/admin/projects', adminProjectRoutes)
 app.use('/api/admin/experience', adminExperienceRoutes)
 app.use('/api/admin/contactinfo', adminContactInfoRoutes)
+app.use('/api/admin/messages', adminMessageRoutes)
+app.use('/api/about', aboutRoutes)
+app.use('/api/admin/about', adminAboutRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`)

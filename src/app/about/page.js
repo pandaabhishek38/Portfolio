@@ -1,27 +1,80 @@
 // src/app/about/page.js
 
-export default function AboutPage() {
+import './AboutPage.css'
+
+export default async function AboutPage() {
+  const summaryRes = await fetch('http://localhost:5001/api/about/summary', {
+    cache: 'no-store',
+  })
+  const educationRes = await fetch(
+    'http://localhost:5001/api/about/education',
+    {
+      cache: 'no-store',
+    }
+  )
+  const skillsRes = await fetch('http://localhost:5001/api/about/skills', {
+    cache: 'no-store',
+  })
+
+  const summaryData = await summaryRes.json()
+  const educationData = await educationRes.json()
+  const skillsData = await skillsRes.json()
+
+  // Group skills by type
+  const skillsByType = {}
+  for (const skill of skillsData) {
+    if (!skillsByType[skill.type]) {
+      skillsByType[skill.type] = []
+    }
+    skillsByType[skill.type].push(skill.name)
+  }
+
   return (
-    <main style={{ padding: '2rem' }}>
+    <main className="about-container">
       <h1>About Me</h1>
-      <p>
-        I'm Abhishek Panda, a passionate Software Engineer with a Master’s in
-        Computer Science from Rutgers University and a Bachelor's in Computer
-        Engineering from the University of Mumbai. My expertise spans full-stack
-        web development, backend systems, and applied machine learning.
-      </p>
-      <p>
-        I’ve built scalable web apps, secure banking systems, and deep learning
-        models for critical use cases like plant species classification and
-        melanoma detection. My toolbelt includes technologies like React,
-        Node.js, Express, Python, Flask, TensorFlow, MongoDB, and PostgreSQL.
-      </p>
-      <p>
-        I love solving real-world problems through code and continuously
-        exploring new technologies—from AI integrations to robust system design.
-        I'm currently focused on building fast, clean, and user-centric
-        applications.
-      </p>
+
+      <div className="summary">
+        {summaryData.map((item) => (
+          <p key={item.id}>{item.content}</p>
+        ))}
+      </div>
+
+      <div className="about-section">
+        <h2>Education</h2>
+        <div className="education-grid">
+          {educationData.map((edu) => (
+            <div key={edu.id} className="education-card">
+              <p>
+                <span>{edu.degree}</span> in <span>{edu.major}</span>
+              </p>
+              <p>
+                {edu.university} ({edu.fromYear} - {edu.toYear})
+              </p>
+              {edu.courses && (
+                <p>
+                  <span>Relevant Courses:</span> {edu.courses}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="about-section">
+        <h2>Skills</h2>
+        {Object.keys(skillsByType).map((type) => (
+          <div key={type}>
+            <h3 style={{ marginTop: '1rem', color: '#ccc' }}>{type}</h3>
+            <div className="skills-grid">
+              {skillsByType[type].map((skill, index) => (
+                <div key={index} className="skill-card">
+                  {skill}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </main>
   )
 }

@@ -45,3 +45,25 @@ model ContactMessage {
   createdAt DateTime @default(now())
 }
 
+model AboutSummary {
+  id      Int    @id @default(autoincrement())
+  content String
+}
+
+model Education {
+  id         Int    @id @default(autoincrement())
+  university String
+  degree     String
+  fromYear   Int
+  toYear     Int
+  major      String
+  courses    String? // Optional: Comma-separated or JSON string
+}
+
+model Skill {
+  id   Int    @id @default(autoincrement())
+  name String
+  type String // e.g., Language, Framework, Tool
+}
+
+
