@@ -14,6 +14,11 @@ export default function AdminDashboard() {
     }
   }, [])
 
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    router.push('/admin/login')
+  }
+
   const sections = [
     {
       title: '📁 Projects',
@@ -44,7 +49,13 @@ export default function AdminDashboard() {
 
   return (
     <main className="admin-dashboard">
-      <h1>🛠️ Admin Dashboard</h1>
+      <div className="admin-header">
+        <h1>🛠️ Admin Dashboard</h1>
+        <button className="logout-btn" onClick={handleLogout}>
+          🚪 Logout
+        </button>
+      </div>
+
       <div className="admin-grid">
         {sections.map((section) => (
           <div

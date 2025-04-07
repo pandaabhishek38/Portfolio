@@ -1,6 +1,29 @@
 .homepage {
   padding: 3rem 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  gap: 2rem;
+}
+
+.hero__image-wrapper {
+  flex-shrink: 0;
+}
+
+.hero__image {
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.hero__content {
+  max-width: 600px;
 }
 
 .hero__title {
@@ -11,7 +34,7 @@
 
 .hero__subtitle {
   font-size: 1.25rem;
-  color: #555;
+  color: #aaa;
   margin-bottom: 2rem;
 }
 
@@ -28,4 +51,17 @@
 
 .hero__cta:hover {
   background-color: #333;
+}
+
+/* Responsive layout for larger screens */
+@media (min-width: 768px) {
+  .hero {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+  }
+
+  .hero__content {
+    margin-left: 2rem;
+  }
 }
