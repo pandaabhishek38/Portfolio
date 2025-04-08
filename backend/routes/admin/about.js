@@ -7,12 +7,9 @@ const router = express.Router()
 const prisma = new PrismaClient()
 
 // UPDATE summary
-// UPDATE summary
 router.put('/summary/:id', verifyToken, async (req, res) => {
   const { id } = req.params
   const { content } = req.body
-
-  console.log('🔧 Incoming PUT /summary:', { id, content })
 
   try {
     const updated = await prisma.aboutSummary.update({
@@ -20,7 +17,6 @@ router.put('/summary/:id', verifyToken, async (req, res) => {
       data: { content },
     })
 
-    console.log('✅ Summary updated:', updated)
     res.json(updated)
   } catch (err) {
     console.error('❌ Failed to update summary:', err)

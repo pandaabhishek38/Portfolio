@@ -5,7 +5,7 @@ import verifyToken from '../../middleware/verifyToken.js'
 const router = express.Router()
 const prisma = new PrismaClient()
 
-// Secure GET (admin only, optional)
+// Secure GET (admin only)
 router.get('/', verifyToken, async (req, res) => {
   try {
     const info = await prisma.contactItem.findMany()
@@ -21,7 +21,7 @@ router.put('/:id', verifyToken, async (req, res) => {
   const { phone, email, address, linkedin, github } = req.body
 
   try {
-    const updates = await Promise.all([
+    await Promise.all([
       prisma.contactItem.updateMany({
         where: { label: 'Phone' },
         data: { value: phone },

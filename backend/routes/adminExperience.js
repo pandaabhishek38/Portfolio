@@ -61,9 +61,4 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
-// Optional Test Route (can keep or remove)
-router.get('/', async (req, res) => {
-  res.json({ message: 'Admin experience route is working!' })
-})
-
 export default router

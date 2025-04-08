@@ -49,7 +49,7 @@ router.post('/', async (req, res) => {
       data: { name, email, message },
     })
 
-    console.log('📩 Email sent and 💾 message saved to DB:', { name, email })
+    //console.log('📩 Email sent and 💾 message saved to DB:', { name, email })
 
     res
       .status(200)

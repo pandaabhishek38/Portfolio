@@ -8,7 +8,7 @@ const router = express.Router()
 // Protect all routes with verifyToken
 router.use(verifyToken)
 
-// GET all messages (admin-only)
+// GET all messages
 router.get('/', async (req, res) => {
   try {
     const messages = await prisma.contactMessage.findMany()
