@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import ProjectCard from '@/components/ProjectCard'
+import ProjectCard from '../../components/ProjectCard'
 import './ProjectsPage.css'
 
 export default function ProjectsPage() {
