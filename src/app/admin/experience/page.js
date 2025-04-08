@@ -8,6 +8,29 @@ export default function AdminExperiencePage() {
   const [experiences, setExperiences] = useState([])
   const [error, setError] = useState(null)
 
+  const [editExperienceId, setEditExperienceId] = useState(null)
+  const [editData, setEditData] = useState({
+    company: '',
+    role: '',
+    period: '',
+    location: '',
+    description: '',
+  })
+
+  const [showNewForm, setShowNewForm] = useState(false)
+  const [newExperience, setNewExperience] = useState({
+    company: '',
+    role: '',
+    period: '',
+    location: '',
+    description: '',
+  })
+
+  const autoResize = (e) => {
+    e.target.style.height = 'auto'
+    e.target.style.height = e.target.scrollHeight + 'px'
+  }
+
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
@@ -15,10 +38,9 @@ export default function AdminExperiencePage() {
       return
     }
 
-    fetch('http://localhost:5001/api/experience', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    fetch(`${baseURL}/api/experience`, {
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok)
@@ -32,25 +54,6 @@ export default function AdminExperiencePage() {
       })
   }, [])
 
-  const [editExperienceId, setEditExperienceId] = useState(null)
-  const [editData, setEditData] = useState({
-    company: '',
-    role: '',
-    period: '',
-    location: '',
-    bullets: [],
-  })
-
-  const [showNewForm, setShowNewForm] = useState(false)
-
-  const [newExperience, setNewExperience] = useState({
-    company: '',
-    role: '',
-    period: '',
-    location: '',
-    bullets: ['', '', ''], // Start with 3 bullets
-  })
-
   const handleEditClick = (exp) => {
     setEditExperienceId(exp.id)
     setEditData({
@@ -58,7 +61,7 @@ export default function AdminExperiencePage() {
       role: exp.role,
       period: exp.period,
       location: exp.location,
-      bullets: exp.bullets,
+      description: exp.description,
     })
   }
 
@@ -67,26 +70,18 @@ export default function AdminExperiencePage() {
     setEditData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleEditBulletsChange = (index, value) => {
-    const updatedBullets = [...editData.bullets]
-    updatedBullets[index] = value
-    setEditData((prev) => ({ ...prev, bullets: updatedBullets }))
-  }
-
   const handleEditSubmit = async (id) => {
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(
-        `http://localhost:5001/api/admin/experience/${id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(editData),
-        }
-      )
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/experience/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editData),
+      })
 
       if (!res.ok) throw new Error('Failed to update experience')
 
@@ -109,18 +104,13 @@ export default function AdminExperiencePage() {
 
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(
-        `http://localhost:5001/api/admin/experience/${id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/experience/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
 
       if (!res.ok) throw new Error('Failed to delete')
-
       setExperiences((prev) => prev.filter((exp) => exp.id !== id))
     } catch (err) {
       console.error('❌ Delete failed:', err)
@@ -133,18 +123,12 @@ export default function AdminExperiencePage() {
     setNewExperience((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleNewBulletsChange = (index, value) => {
-    const updated = [...newExperience.bullets]
-    updated[index] = value
-    setNewExperience((prev) => ({ ...prev, bullets: updated }))
-  }
-
   const handleNewSubmit = async (e) => {
     e.preventDefault()
-
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:5001/api/admin/experience', {
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/experience`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +138,6 @@ export default function AdminExperiencePage() {
       })
 
       if (!res.ok) throw new Error('Failed to add experience')
-
       const created = await res.json()
       setExperiences((prev) => [...prev, created])
       setShowNewForm(false)
@@ -163,7 +146,7 @@ export default function AdminExperiencePage() {
         role: '',
         period: '',
         location: '',
-        bullets: ['', '', ''],
+        description: '',
       })
     } catch (err) {
       console.error('❌ Failed to add experience:', err)
@@ -231,33 +214,33 @@ export default function AdminExperiencePage() {
             required
             style={{ display: 'block', marginBottom: '0.5rem', width: '100%' }}
           />
-
-          <p style={{ margin: '0.5rem 0 0.25rem' }}>Bullets:</p>
-          {newExperience.bullets.map((point, i) => (
-            <textarea
-              key={i}
-              rows="2"
-              value={point}
-              onChange={(e) => handleNewBulletsChange(i, e.target.value)}
-              placeholder={`Bullet ${i + 1}`}
-              style={{
-                display: 'block',
-                width: '100%',
-                marginBottom: '0.5rem',
-              }}
-              required
-            />
-          ))}
+          <textarea
+            name="description"
+            value={newExperience.description}
+            onChange={(e) => {
+              handleNewChange(e)
+              autoResize(e)
+            }}
+            placeholder="Experience description"
+            rows="3"
+            style={{
+              display: 'block',
+              width: '100%',
+              marginBottom: '1rem',
+              overflow: 'hidden',
+              resize: 'none',
+            }}
+            required
+          />
 
           <button
             type="submit"
             style={{
-              marginTop: '0.5rem',
               backgroundColor: '#28a745',
               color: 'white',
               fontWeight: 'bold',
-              border: 'none',
               padding: '0.6rem 1.2rem',
+              border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
             }}
@@ -331,24 +314,23 @@ export default function AdminExperiencePage() {
                       marginBottom: '0.5rem',
                     }}
                   />
-
-                  <p style={{ margin: '0.5rem 0 0.25rem' }}>Bullets:</p>
-                  {editData.bullets.map((point, i) => (
-                    <textarea
-                      key={i}
-                      rows="2"
-                      value={point}
-                      onChange={(e) =>
-                        handleEditBulletsChange(i, e.target.value)
-                      }
-                      placeholder={`Bullet ${i + 1}`}
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        marginBottom: '0.5rem',
-                      }}
-                    />
-                  ))}
+                  <textarea
+                    name="description"
+                    value={editData.description}
+                    onChange={(e) => {
+                      handleEditChange(e)
+                      autoResize(e)
+                    }}
+                    rows="3"
+                    placeholder="Edit experience description"
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      marginBottom: '1rem',
+                      overflow: 'hidden',
+                      resize: 'none',
+                    }}
+                  />
 
                   <div style={{ marginTop: '0.75rem' }}>
                     <button
@@ -370,13 +352,16 @@ export default function AdminExperiencePage() {
                   <p style={{ color: '#444' }}>
                     <strong>{exp.role}</strong> | {exp.period} | {exp.location}
                   </p>
-                  <ul>
-                    {exp.bullets.map((point, i) => (
-                      <li key={i} style={{ color: '#555', lineHeight: '1.5' }}>
-                        {point}
-                      </li>
-                    ))}
-                  </ul>
+                  <p
+                    style={{
+                      marginTop: '0.5rem',
+                      color: '#333',
+                      lineHeight: '1.6',
+                      whiteSpace: 'pre-line',
+                    }}
+                  >
+                    {exp.description}
+                  </p>
                   <div style={{ marginTop: '0.75rem' }}>
                     <button
                       onClick={() => handleEditClick(exp)}

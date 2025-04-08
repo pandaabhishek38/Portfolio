@@ -3,16 +3,17 @@
 import './AboutPage.css'
 
 export default async function AboutPage() {
-  const summaryRes = await fetch('http://localhost:5001/api/about/summary', {
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+  const summaryRes = await fetch(`${baseURL}/api/about/summary`, {
     cache: 'no-store',
   })
-  const educationRes = await fetch(
-    'http://localhost:5001/api/about/education',
-    {
-      cache: 'no-store',
-    }
-  )
-  const skillsRes = await fetch('http://localhost:5001/api/about/skills', {
+
+  const educationRes = await fetch(`${baseURL}/api/about/education`, {
+    cache: 'no-store',
+  })
+
+  const skillsRes = await fetch(`${baseURL}/api/about/skills`, {
     cache: 'no-store',
   })
 

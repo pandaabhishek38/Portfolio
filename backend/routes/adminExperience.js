@@ -7,10 +7,9 @@ const router = express.Router()
 
 router.use(verifyToken)
 
-// GET all experiences (already done client-side)
-
+// CREATE Experience
 router.post('/', async (req, res) => {
-  const { company, role, period, location, bullets } = req.body
+  const { company, role, period, location, description } = req.body
   try {
     const created = await prisma.experience.create({
       data: {
@@ -18,7 +17,7 @@ router.post('/', async (req, res) => {
         role,
         period,
         location,
-        bullets: { set: bullets },
+        description,
       },
     })
     res.status(201).json(created)
@@ -28,8 +27,9 @@ router.post('/', async (req, res) => {
   }
 })
 
+// UPDATE Experience
 router.put('/:id', async (req, res) => {
-  const { company, role, period, location, bullets } = req.body
+  const { company, role, period, location, description } = req.body
   const { id } = req.params
   try {
     const updated = await prisma.experience.update({
@@ -39,7 +39,7 @@ router.put('/:id', async (req, res) => {
         role,
         period,
         location,
-        bullets: { set: bullets },
+        description,
       },
     })
     res.json(updated)
@@ -49,6 +49,7 @@ router.put('/:id', async (req, res) => {
   }
 })
 
+// DELETE Experience
 router.delete('/:id', async (req, res) => {
   const { id } = req.params
   try {
@@ -60,6 +61,7 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+// Optional Test Route (can keep or remove)
 router.get('/', async (req, res) => {
   res.json({ message: 'Admin experience route is working!' })
 })

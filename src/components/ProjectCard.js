@@ -10,7 +10,13 @@ export default function ProjectCard({
     <div className="project-card">
       <h2 className="project-card__title">{title}</h2>
       <p className="project-card__tech">{techStack}</p>
-      <p className="project-card__desc">{description}</p>
+      <p
+        className="project-card__desc"
+        dangerouslySetInnerHTML={{
+          __html: description.replace(/\n/g, '<br />'),
+        }}
+      ></p>
+
       {githubLink && (
         <a
           className="project-card__github"
@@ -18,7 +24,7 @@ export default function ProjectCard({
           target="_blank"
           rel="noopener noreferrer"
         >
-          View on GitHub →
+          View →
         </a>
       )}
     </div>

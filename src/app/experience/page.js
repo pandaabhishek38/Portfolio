@@ -6,7 +6,8 @@ export default function ExperiencePage() {
   const [experiences, setExperiences] = useState([])
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/experience')
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    fetch(`${baseURL}/api/experience`)
       .then((res) => res.json())
       .then((data) => setExperiences(data))
       .catch((err) => console.error('API fetch error:', err))
@@ -22,11 +23,14 @@ export default function ExperiencePage() {
           <p>
             <strong>{exp.role}</strong> | {exp.period} | {exp.location}
           </p>
-          <ul>
-            {exp.bullets.map((point, i) => (
-              <li key={i}>{point}</li>
-            ))}
-          </ul>
+          {exp.description && (
+            <p
+              className="experience-description"
+              dangerouslySetInnerHTML={{
+                __html: exp.description.replace(/\n/g, '<br />'),
+              }}
+            ></p>
+          )}
         </section>
       ))}
     </main>

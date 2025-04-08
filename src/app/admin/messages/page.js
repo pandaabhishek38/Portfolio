@@ -39,15 +39,13 @@ export default function AdminMessagesPage() {
 
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(
-        `http://localhost:5001/api/admin/messages/${id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/messages/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       if (!res.ok) throw new Error('Failed to delete message')
 

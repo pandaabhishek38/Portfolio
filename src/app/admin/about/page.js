@@ -17,9 +17,10 @@ export default function AdminAboutPage() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) return router.push('/admin/login')
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
     // Fetch Summary
-    fetch('http://localhost:5001/api/about/summary')
+    fetch(`${baseURL}/api/about/summary`)
       .then((res) => res.json())
       .then((data) => {
         if (data.length > 0) {
@@ -34,12 +35,12 @@ export default function AdminAboutPage() {
       })
 
     // Fetch Education
-    fetch('http://localhost:5001/api/about/education')
+    fetch(`${baseURL}/api/about/education`)
       .then((res) => res.json())
       .then((data) => setEducation(data))
 
     // Fetch Skills
-    fetch('http://localhost:5001/api/about/skills')
+    fetch(`${baseURL}/api/about/skills`)
       .then((res) => res.json())
       .then((data) => setSkills(data))
   }, [])
@@ -72,8 +73,9 @@ export default function AdminAboutPage() {
     }
 
     try {
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const res = await fetch(
-        `http://localhost:5001/api/admin/about/summary/${summaryId}`, // ✅ Dynamic ID
+        `${baseURL}/api/admin/about/summary/${summaryId}`, // ✅ Dynamic ID
         {
           method: 'PUT',
           headers: {
@@ -124,8 +126,9 @@ export default function AdminAboutPage() {
 
   const handleEducationUpdate = async () => {
     try {
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const res = await fetch(
-        `http://localhost:5001/api/admin/about/education/${editEducationId}`,
+        `${baseURL}/api/admin/about/education/${editEducationId}`,
         {
           method: 'PUT',
           headers: {
@@ -156,15 +159,13 @@ export default function AdminAboutPage() {
     if (!confirm) return
 
     try {
-      const res = await fetch(
-        `http://localhost:5001/api/admin/about/education/${id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/about/education/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       if (!res.ok) throw new Error('Failed to delete education')
 
@@ -184,17 +185,15 @@ export default function AdminAboutPage() {
 
   const handleAddEducation = async () => {
     try {
-      const res = await fetch(
-        'http://localhost:5001/api/admin/about/education',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newEducation),
-        }
-      )
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/about/education`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newEducation),
+      })
 
       if (!res.ok) throw new Error('Failed to add education')
 
@@ -240,8 +239,9 @@ export default function AdminAboutPage() {
 
   const handleUpdateSkill = async () => {
     try {
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const res = await fetch(
-        `http://localhost:5001/api/admin/about/skills/${editSkillId}`,
+        `${baseURL}/api/admin/about/skills/${editSkillId}`,
         {
           method: 'PUT',
           headers: {
@@ -270,15 +270,13 @@ export default function AdminAboutPage() {
     if (!confirm) return
 
     try {
-      const res = await fetch(
-        `http://localhost:5001/api/admin/about/skills/${id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/about/skills/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       if (!res.ok) throw new Error('Failed to delete skill')
 
@@ -291,7 +289,8 @@ export default function AdminAboutPage() {
 
   const addSkill = async () => {
     try {
-      const res = await fetch('http://localhost:5001/api/admin/about/skills', {
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/about/skills`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

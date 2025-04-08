@@ -16,8 +16,9 @@ export default function AdminContactInfoPage() {
       router.push('/admin/login')
       return
     }
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
-    fetch('http://localhost:5001/api/admin/contactinfo', {
+    fetch(`${baseURL}/api/admin/contactinfo`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -55,8 +56,9 @@ export default function AdminContactInfoPage() {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const res = await fetch(
-        `http://localhost:5001/api/admin/contactinfo/${contact.id}`,
+        `${baseURL}/api/admin/contactinfo/${contact.id}`,
         {
           method: 'PUT',
           headers: {
@@ -70,14 +72,11 @@ export default function AdminContactInfoPage() {
       if (!res.ok) throw new Error('Update failed')
 
       // 🔄 RE-FETCH full contact info here after update
-      const updatedRes = await fetch(
-        'http://localhost:5001/api/admin/contactinfo',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      const updatedRes = await fetch(`${baseURL}/api/admin/contactinfo`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       const updatedData = await updatedRes.json()
 

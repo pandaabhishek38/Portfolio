@@ -7,7 +7,8 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState([])
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/projects')
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    fetch(`${baseURL}/api/projects`)
       .then((res) => res.json())
       .then((data) => setProjects(data))
       .catch((err) => console.error('API fetch error:', err))

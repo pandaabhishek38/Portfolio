@@ -1,12 +1,29 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function AdminProjectsPage() {
   const router = useRouter()
   const [projects, setProjects] = useState([])
   const [error, setError] = useState(null)
+
+  const [editProjectId, setEditProjectId] = useState(null)
+  const [editData, setEditData] = useState({
+    title: '',
+    stack: '',
+    description: '',
+    github: '',
+  })
+
+  const [newProject, setNewProject] = useState({
+    title: '',
+    stack: '',
+    description: '',
+    github: '',
+  })
+
+  const [showNewForm, setShowNewForm] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -15,11 +32,10 @@ export default function AdminProjectsPage() {
       return
     }
 
-    // Fetch projects with token (we’ll protect backend later)
-    fetch('http://localhost:5001/api/projects', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+    fetch(`${baseURL}/api/projects`, {
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error('Unauthorized or error fetching projects')
@@ -31,44 +47,6 @@ export default function AdminProjectsPage() {
         setError('You are not authorized or something went wrong.')
       })
   }, [])
-
-  const handleDelete = async (projectId) => {
-    const confirmDelete = window.confirm(
-      'Are you sure you want to delete this project?'
-    )
-    if (!confirmDelete) return
-
-    try {
-      const token = localStorage.getItem('token')
-      const res = await fetch(
-        `http://localhost:5001/api/admin/projects/${projectId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-
-      if (!res.ok) {
-        throw new Error('Failed to delete project')
-      }
-
-      // Refresh the list after deletion
-      setProjects((prev) => prev.filter((p) => p.id !== projectId))
-    } catch (err) {
-      console.error('❌ Delete failed:', err)
-      alert('Something went wrong while deleting.')
-    }
-  }
-
-  const [editProjectId, setEditProjectId] = useState(null)
-  const [editData, setEditData] = useState({
-    title: '',
-    stack: '',
-    description: '',
-    github: '',
-  })
 
   const handleEditClick = (project) => {
     setEditProjectId(project.id)
@@ -88,17 +66,15 @@ export default function AdminProjectsPage() {
   const handleEditSubmit = async (id) => {
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(
-        `http://localhost:5001/api/admin/projects/${id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(editData),
-        }
-      )
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/projects/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editData),
+      })
 
       if (!res.ok) throw new Error('Failed to update project')
 
@@ -113,13 +89,6 @@ export default function AdminProjectsPage() {
     }
   }
 
-  const [newProject, setNewProject] = useState({
-    title: '',
-    stack: '',
-    description: '',
-    github: '',
-  })
-
   const handleNewChange = (e) => {
     const { name, value } = e.target
     setNewProject((prev) => ({ ...prev, [name]: value }))
@@ -129,7 +98,8 @@ export default function AdminProjectsPage() {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:5001/api/admin/projects', {
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,6 +112,7 @@ export default function AdminProjectsPage() {
 
       const created = await res.json()
       setProjects((prev) => [...prev, created])
+      setShowNewForm(false)
       setNewProject({ title: '', stack: '', description: '', github: '' })
     } catch (err) {
       console.error('❌ Failed to add project:', err)
@@ -149,7 +120,32 @@ export default function AdminProjectsPage() {
     }
   }
 
-  const [showNewForm, setShowNewForm] = useState(false)
+  const autoResize = (el) => {
+    el.style.height = 'auto'
+    el.style.height = el.scrollHeight + 'px'
+  }
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this project?'
+    )
+    if (!confirmDelete) return
+
+    try {
+      const token = localStorage.getItem('token')
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/admin/projects/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (!res.ok) throw new Error('Failed to delete')
+      setProjects((prev) => prev.filter((proj) => proj.id !== id))
+    } catch (err) {
+      console.error('❌ Delete failed:', err)
+      alert('Failed to delete project.')
+    }
+  }
 
   return (
     <main style={{ padding: '2rem' }}>
@@ -176,66 +172,54 @@ export default function AdminProjectsPage() {
       </button>
 
       {showNewForm && (
-        <>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
-            ➕ Add New Project
-          </h2>
-          <form onSubmit={handleNewSubmit} style={{ marginBottom: '2rem' }}>
-            <input
-              type="text"
-              name="title"
-              value={newProject.title}
-              onChange={handleNewChange}
-              placeholder="Project Title"
-              required
-              style={{
-                display: 'block',
-                width: '100%',
-                marginBottom: '0.5rem',
-              }}
-            />
-            <input
-              type="text"
-              name="stack"
-              value={newProject.stack}
-              onChange={handleNewChange}
-              placeholder="Tech Stack"
-              required
-              style={{
-                display: 'block',
-                width: '100%',
-                marginBottom: '0.5rem',
-              }}
-            />
-            <textarea
-              name="description"
-              value={newProject.description}
-              onChange={handleNewChange}
-              placeholder="Description"
-              rows="3"
-              required
-              style={{
-                display: 'block',
-                width: '100%',
-                marginBottom: '0.5rem',
-              }}
-            />
-            <input
-              type="text"
-              name="github"
-              value={newProject.github}
-              onChange={handleNewChange}
-              placeholder="GitHub Link"
-              required
-              style={{
-                display: 'block',
-                width: '100%',
-                marginBottom: '0.5rem',
-              }}
-            />
-            <button type="submit">➕ Add Project</button>
-          </form>
-        </>
+        <form onSubmit={handleNewSubmit} style={{ marginBottom: '2rem' }}>
+          <input
+            type="text"
+            name="title"
+            value={newProject.title}
+            onChange={handleNewChange}
+            placeholder="Project Title"
+            required
+            style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
+          />
+          <input
+            type="text"
+            name="stack"
+            value={newProject.stack}
+            onChange={handleNewChange}
+            placeholder="Tech Stack"
+            required
+            style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
+          />
+          <textarea
+            name="description"
+            value={newProject.description}
+            onChange={(e) => {
+              handleNewChange(e)
+              autoResize(e.target)
+            }}
+            placeholder="Description (with line breaks if needed)"
+            rows="3"
+            required
+            style={{
+              display: 'block',
+              width: '100%',
+              marginBottom: '0.5rem',
+              overflow: 'hidden',
+              resize: 'none',
+            }}
+          />
+          <input
+            type="text"
+            name="github"
+            value={newProject.github}
+            onChange={handleNewChange}
+            placeholder="GitHub Link"
+            required
+            style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
+          />
+          <button type="submit">➕ Add Project</button>
+        </form>
       )}
 
       {projects.length > 0 ? (
@@ -273,10 +257,18 @@ export default function AdminProjectsPage() {
                   <textarea
                     name="description"
                     value={editData.description}
-                    onChange={handleEditChange}
-                    placeholder="Description"
+                    onChange={(e) => {
+                      handleEditChange(e)
+                      autoResize(e.target)
+                    }}
+                    placeholder="Edit project description"
                     rows="3"
-                    style={{ marginBottom: '0.5rem', width: '100%' }}
+                    style={{
+                      marginBottom: '0.5rem',
+                      width: '100%',
+                      overflow: 'hidden',
+                      resize: 'none',
+                    }}
                   />
                   <input
                     type="text"
@@ -306,11 +298,12 @@ export default function AdminProjectsPage() {
                   <p style={{ margin: '0.5rem 0', color: '#444' }}>
                     {project.stack}
                   </p>
-                  <p style={{ color: '#555' }}>{project.description}</p>
+                  <p style={{ color: '#555', whiteSpace: 'pre-line' }}>
+                    {project.description}
+                  </p>
                   <a href={project.github} target="_blank" rel="noreferrer">
-                    View on GitHub →
+                    View →
                   </a>
-
                   <div style={{ marginTop: '1rem' }}>
                     <button
                       style={{ marginRight: '1rem' }}

@@ -22,13 +22,14 @@ model Project {
 }
 
 model Experience {
-  id       Int      @id @default(autoincrement())
-  company  String
-  role     String
-  period   String
-  location String
-  bullets  String[] @default([])
+  id          Int     @id @default(autoincrement())
+  company     String
+  role        String
+  period      String
+  location    String
+  description String  // ✅ New field instead of bullet points
 }
+
 
 model ContactItem {
   id     Int    @id @default(autoincrement())

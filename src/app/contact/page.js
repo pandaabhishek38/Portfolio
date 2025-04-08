@@ -10,7 +10,9 @@ export default function ContactPage() {
   const [status, setStatus] = useState(null)
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/contact-info')
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+    fetch(`${baseURL}/api/contact-info`)
       .then((res) => res.json())
       .then((data) => setContactInfo(data))
       .catch((err) => console.error('Contact info fetch error:', err))
@@ -48,7 +50,8 @@ export default function ContactPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:5001/api/contact', {
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const res = await fetch(`${baseURL}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

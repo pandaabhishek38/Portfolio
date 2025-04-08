@@ -1,5 +1,12 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+import path from 'path'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+dotenv.config({ path: path.resolve(__dirname, '../.env') }) // 👈 force load correct path
 
 const router = express.Router()
 
