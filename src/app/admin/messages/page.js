@@ -29,7 +29,7 @@ export default function AdminMessagesPage() {
         console.error('❌ Fetch error:', err)
         setError('Failed to load messages.')
       })
-  }, [])
+  }, [router])
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(

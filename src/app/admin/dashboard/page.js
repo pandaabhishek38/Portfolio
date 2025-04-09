@@ -12,7 +12,7 @@ export default function AdminDashboard() {
     if (!token) {
       router.push('/admin/login')
     }
-  }, [])
+  }, [router])
 
   const handleLogout = () => {
     localStorage.removeItem('token')

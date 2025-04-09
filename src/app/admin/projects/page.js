@@ -46,7 +46,7 @@ export default function AdminProjectsPage() {
         console.error('❌ Project fetch error:', err)
         setError('You are not authorized or something went wrong.')
       })
-  }, [])
+  }, [router])
 
   const handleEditClick = (project) => {
     setEditProjectId(project.id)

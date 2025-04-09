@@ -45,7 +45,7 @@ export default function AdminContactInfoPage() {
         console.error('❌ Fetch error:', err)
         setError('Failed to load contact info.')
       })
-  }, [])
+  }, [router])
 
   const handleChange = (e) => {
     const { name, value } = e.target

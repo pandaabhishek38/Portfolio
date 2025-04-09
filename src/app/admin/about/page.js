@@ -43,7 +43,7 @@ export default function AdminAboutPage() {
     fetch(`${baseURL}/api/about/skills`)
       .then((res) => res.json())
       .then((data) => setSkills(data))
-  }, [])
+  }, [router])
 
   const [editEducationId, setEditEducationId] = useState(null)
   const [educationForm, setEducationForm] = useState({

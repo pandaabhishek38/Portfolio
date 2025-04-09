@@ -52,7 +52,7 @@ export default function AdminExperiencePage() {
         console.error('❌ Experience fetch error:', err)
         setError('You are not authorized or something went wrong.')
       })
-  }, [])
+  }, [router])
 
   const handleEditClick = (exp) => {
     setEditExperienceId(exp.id)

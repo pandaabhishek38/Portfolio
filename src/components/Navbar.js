@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import './Navbar.css'
 
 export default function Navbar() {
   const router = useRouter()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-  // Check if the user is logged in (via token)
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
@@ -21,19 +21,19 @@ export default function Navbar() {
       <div className="navbar__logo">Abhishek Panda</div>
       <ul className="navbar__links">
         <li>
-          <a href="/">Home</a>
+          <Link href="/">Home</Link>
         </li>
         <li>
-          <a href="/about">About</a>
+          <Link href="/about">About</Link>
         </li>
         <li>
-          <a href="/projects">Projects</a>
+          <Link href="/projects">Projects</Link>
         </li>
         <li>
-          <a href="/experience">Experience</a>
+          <Link href="/experience">Experience</Link>
         </li>
         <li>
-          <a href="/contact">Contact</a>
+          <Link href="/contact">Contact</Link>
         </li>
       </ul>
       <div className="navbar__admin">

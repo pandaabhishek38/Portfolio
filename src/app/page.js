@@ -16,7 +16,7 @@ export default function HomePage() {
           />
         </div>
         <div className="hero__content">
-          <h1 className="hero__title">Hey, I'm Abhishek 👋</h1>
+          <h1 className="hero__title">Hey, I&apos;m Abhishek 👋</h1>
           <p className="hero__subtitle">
             Software Engineer | Backend Enthusiast | ML Explorer
           </p>
