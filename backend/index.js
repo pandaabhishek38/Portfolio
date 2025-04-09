@@ -11,6 +11,7 @@ import adminContactInfoRoutes from './routes/admin/contactinfo.js'
 import adminMessageRoutes from './routes/admin/messages.js'
 import aboutRoutes from './routes/about.js'
 import adminAboutRoutes from './routes/admin/about.js'
+import adminSeedRoutes from './routes/admin/seed.js'
 
 import dotenv from 'dotenv'
 dotenv.config()
@@ -41,6 +42,7 @@ app.use('/api/admin/contactinfo', adminContactInfoRoutes)
 app.use('/api/admin/messages', adminMessageRoutes)
 app.use('/api/about', aboutRoutes)
 app.use('/api/admin/about', adminAboutRoutes)
+app.use('/api/admin/seed', adminSeedRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`)
