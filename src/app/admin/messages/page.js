@@ -14,8 +14,9 @@ export default function AdminMessagesPage() {
       router.push('/admin/login')
       return
     }
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
-    fetch('http://localhost:5001/api/admin/messages', {
+    fetch(`${baseURL}/api/admin/messages`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
