@@ -57,17 +57,14 @@ export default function AdminContactInfoPage() {
     try {
       const token = localStorage.getItem('token')
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
-      const res = await fetch(
-        `${baseURL}/api/admin/contactinfo/${contact.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(editData),
-        }
-      )
+      const res = await fetch(`${baseURL}/api/admin/contactinfo`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editData),
+      })
 
       if (!res.ok) throw new Error('Update failed')
 

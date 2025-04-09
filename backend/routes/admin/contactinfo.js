@@ -17,11 +17,19 @@ router.get('/', verifyToken, async (req, res) => {
 })
 
 // Update contact info
-router.put('/:id', verifyToken, async (req, res) => {
+router.put('/', verifyToken, async (req, res) => {
   const { phone, email, address, linkedin, github } = req.body
 
+  console.log('📥 Received update data:', {
+    phone,
+    email,
+    address,
+    linkedin,
+    github,
+  })
+
   try {
-    await Promise.all([
+    const result = await Promise.all([
       prisma.contactItem.updateMany({
         where: { label: 'Phone' },
         data: { value: phone },
@@ -43,6 +51,8 @@ router.put('/:id', verifyToken, async (req, res) => {
         data: { value: github },
       }),
     ])
+
+    console.log('✅ UpdateMany results:', result)
 
     const updated = await prisma.contactItem.findMany()
     res.json(updated)
