@@ -80,8 +80,16 @@ export default function ContactPage() {
         {contactInfo.map((item) => (
           <li key={item.id}>
             <strong>{item.label}:</strong>{' '}
-            {item.url ? (
-              <a href={item.url} target="_blank" rel="noopener noreferrer">
+            {item.label === 'GitHub' || item.label === 'LinkedIn' ? (
+              <a
+                href={
+                  item.value.startsWith('http')
+                    ? item.value
+                    : `https://${item.value}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {item.value}
               </a>
             ) : (
