@@ -1,5 +1,5 @@
 // src/app/page.js
-// import Image from 'next/image'
+import Image from 'next/image'
 import './home.css'
 
 export default function HomePage() {
@@ -7,7 +7,7 @@ export default function HomePage() {
     <main className="homepage">
       <section className="hero">
         <div className="hero__image-wrapper">
-          <img
+          <Image
             src="/static/profile.png"
             alt="Abhishek Panda"
             width={220}
