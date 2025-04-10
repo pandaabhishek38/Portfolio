@@ -4,7 +4,7 @@ export default function ImageTestPage() {
       <h1>🧪 Image Test</h1>
       <p>Testing raw static image:</p>
       <img
-        src="/static/profile.png"
+        src="/static/avatar-test.jpeg"
         alt="Debug Image"
         width={200}
         height={200}
