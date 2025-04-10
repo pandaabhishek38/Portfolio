@@ -8,7 +8,7 @@ export default function HomePage() {
       <section className="hero">
         <div className="hero__image-wrapper">
           <img
-            src="/abhishek-profile.png"
+            src="/static/profile.png"
             alt="Abhishek Panda"
             width={220}
             height={220}
