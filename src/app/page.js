@@ -18,8 +18,7 @@ export default function HomePage() {
         <div className="hero__content">
           <h1 className="hero__title">Hey, I&apos;m Abhishek 👋</h1>
           <p className="hero__subtitle">
-            Software Engineer | Full Stack Developer | Exploring ML in
-            Production
+            Software Engineer | Full Stack Developer | ML in Production
           </p>
           <a href="/projects" className="hero__cta">
             View My Work →
