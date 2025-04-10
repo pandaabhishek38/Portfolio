@@ -43,3 +43,9 @@
   font-weight: bold;
   margin-top: 1rem;
 }
+
+.login-page h1 {
+  font-size: 2rem;
+  color: #222;
+  margin-bottom: 1.5rem;
+}
