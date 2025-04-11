@@ -43,12 +43,21 @@
   background-color: #0059c1;
 }
 
+.project-card__toggle:hover {
+  text-decoration: underline;
+}
+
 .project-card__toggle {
   color: #0070f3;
   cursor: pointer;
   font-weight: bold;
+  display: inline-block;
+  margin-bottom: 0.5rem;
 }
 
-.project-card__toggle:hover {
-  text-decoration: underline;
+.project-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
 }
