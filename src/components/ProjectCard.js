@@ -15,16 +15,39 @@ export default function ProjectCard({
     ? description
     : description.slice(0, previewLength) + (shouldTruncate ? '...' : '')
 
+  // New function to format bullet points
+  const formatDescription = (text) => {
+    return text.split('\n').map((line, index) => {
+      if (line.startsWith('-->')) {
+        return (
+          <li
+            key={index}
+            style={{ marginLeft: '20px', listStyleType: 'circle' }}
+          >
+            {line.replace('-->', '').trim()}
+          </li>
+        )
+      }
+      if (line.startsWith('-')) {
+        return (
+          <li key={index} style={{ marginLeft: '0px', listStyleType: 'disc' }}>
+            {line.replace('-', '').trim()}
+          </li>
+        )
+      }
+      return (
+        <p key={index} style={{ marginLeft: '0px' }}>
+          {line}
+        </p>
+      )
+    })
+  }
+
   return (
     <div className="project-card">
       <h2 className="project-card__title">{title}</h2>
       <p className="project-card__tech">{techStack}</p>
-      <p
-        className="project-card__desc"
-        dangerouslySetInnerHTML={{
-          __html: visibleText.replace(/\n/g, '<br />'),
-        }}
-      ></p>
+      <ul className="project-card__desc">{formatDescription(visibleText)}</ul>
 
       <div className="project-card__footer">
         {shouldTruncate && (

@@ -61,3 +61,17 @@
   align-items: center;
   margin-top: 1rem;
 }
+
+.project-card__desc {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.project-card__desc ul {
+  padding-left: 20px;
+}
+
+.project-card__desc li {
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
