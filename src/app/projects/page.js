@@ -10,7 +10,11 @@ export default function ProjectsPage() {
     const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     fetch(`${baseURL}/api/projects`)
       .then((res) => res.json())
-      .then((data) => setProjects(data))
+      .then((data) => {
+        // Sort by ID to preserve the original insertion order
+        const sortedProjects = data.sort((a, b) => a.id - b.id)
+        setProjects(sortedProjects)
+      })
       .catch((err) => console.error('API fetch error:', err))
   }, [])
 
