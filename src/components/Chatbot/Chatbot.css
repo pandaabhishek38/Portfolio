@@ -1,0 +1,212 @@
+/* src/components/Chatbot/Chatbot.css */
+
+/* Chat Icon */
+.chat-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #007bff;
+  color: #ffffff;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.2s;
+  z-index: 1000;
+}
+
+.chat-icon:hover {
+  background-color: #0056b3;
+  box-shadow: 0 0 30px rgba(0, 85, 255, 0.6);
+  transform: scale(1.08);
+}
+
+/* Chatbot Container */
+.chatbot-container {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 350px;
+  max-height: 500px;
+  background: linear-gradient(145deg, #ffffff, #f4f6f8);
+  border-radius: 15px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  z-index: 9999;
+  animation: bounce-in 0.5s ease-out;
+}
+
+.chatbot-container.open {
+  display: flex;
+  animation: bounce-in 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+/* Bounce In Animation */
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(50px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-10px);
+  }
+  80% {
+    transform: scale(0.98) translateY(5px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Chatbot Header */
+.chatbot-header {
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 12px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 15px 15px 0 0;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
+}
+
+.chatbot-header:hover {
+  background-color: #0056b3;
+}
+
+/* Chatbot Body */
+.chatbot-body {
+  flex-grow: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  font-size: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: #007bff #f4f6f8;
+}
+
+/* Scrollbar Styling */
+.chatbot-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chatbot-body::-webkit-scrollbar-thumb {
+  background-color: #007bff;
+  border-radius: 4px;
+}
+
+/* Message Bubbles */
+.message {
+  margin-bottom: 15px;
+  padding: 12px 15px;
+  border-radius: 15px;
+  max-width: 85%;
+  word-wrap: break-word;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  transition: transform 0.2s;
+}
+
+.message.user {
+  background-color: #007bff;
+  color: #ffffff;
+  margin-left: auto;
+  text-align: right;
+  box-shadow: 0 4px 20px rgba(0, 123, 255, 0.2);
+}
+
+.message.user:hover {
+  transform: scale(1.02);
+}
+
+.message.bot {
+  background-color: #f4f6f8;
+  color: #333333;
+  text-align: left;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.message.bot:hover {
+  transform: scale(1.02);
+}
+
+/* Typing Indicator */
+.message.bot.typing {
+  font-style: italic;
+  color: #888;
+  margin-left: 10px;
+  margin-bottom: 15px;
+}
+
+/* Chatbot Footer */
+.chatbot-footer {
+  display: flex;
+  padding: 12px;
+  border-top: 1px solid #dddddd;
+  background-color: #f4f6f8;
+  border-radius: 0 0 15px 15px;
+  gap: 10px;
+}
+
+.chatbot-footer input[type='text'] {
+  flex-grow: 1;
+  padding: 12px 15px;
+  border-radius: 12px;
+  border: 1px solid #dddddd;
+  margin-right: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.chatbot-footer input[type='text']:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+}
+
+/* Ripple Effect on Send Button */
+.chatbot-footer button {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  overflow: hidden;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.chatbot-footer button::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.6);
+  width: 300%;
+  height: 300%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.6s, transform 0.6s;
+}
+
+.chatbot-footer button:active::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(0);
+}
+
+.chatbot-footer button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}

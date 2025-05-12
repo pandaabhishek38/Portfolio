@@ -1,6 +1,8 @@
+// src/app/layout.js
 import { Geist, Geist_Mono } from 'next/font/google'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import Chatbot from '../components/Chatbot/Chatbot'
 import './globals.css'
 
 const geistSans = Geist({
@@ -26,6 +28,7 @@ export default function RootLayout({ children }) {
           <Navbar />
           {children}
           <Footer />
+          <Chatbot />
         </div>
       </body>
     </html>
