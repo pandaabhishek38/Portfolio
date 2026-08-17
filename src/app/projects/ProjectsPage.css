@@ -1,18 +1,277 @@
 .projects-page {
-  padding: 2rem;
-  max-width: 1000px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 5rem 2rem 6rem;
+
+  color: #f5f5f5;
+}
+
+/* --------------------------------
+   Page Header
+-------------------------------- */
+
+.projects-page__header {
+  max-width: 760px;
+  margin: 0 auto 3.5rem;
+
+  text-align: center;
+}
+
+.projects-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+
+  color: #0070f3;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .projects-page__title {
-  text-align: center;
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-  color: #f3eaea;
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
 }
+
+.projects-page__subtitle {
+  max-width: 620px;
+  margin: 1rem auto 0;
+
+  color: #8f8f8f;
+
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* --------------------------------
+   Project Grid
+-------------------------------- */
 
 .projects-grid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+
+  align-items: stretch;
+}
+
+/* --------------------------------
+   Loading Skeletons
+-------------------------------- */
+
+.project-skeleton {
+  display: flex;
   flex-direction: column;
-  gap: 2rem;
+
+  min-height: 360px;
+  padding: 1.75rem;
+
+  background: #171717;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+
+  overflow: hidden;
+}
+
+.project-skeleton__eyebrow {
+  width: 55px;
+  height: 10px;
+  margin-bottom: 1rem;
+
+  border-radius: 4px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+.project-skeleton__title {
+  width: 65%;
+  height: 26px;
+  margin-bottom: 1.25rem;
+
+  border-radius: 5px;
+
+  background: rgba(255, 255, 255, 0.09);
+
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+.project-skeleton__tech {
+  display: flex;
+  gap: 0.5rem;
+
+  margin-bottom: 1.5rem;
+}
+
+.project-skeleton__tech span {
+  width: 75px;
+  height: 30px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+.project-skeleton__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.project-skeleton__text span {
+  width: 100%;
+  height: 12px;
+
+  border-radius: 4px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+.project-skeleton__text span:nth-child(2) {
+  width: 92%;
+}
+
+.project-skeleton__text span:nth-child(3) {
+  width: 84%;
+}
+
+.project-skeleton__text span:nth-child(4) {
+  width: 70%;
+}
+
+.project-skeleton__footer {
+  width: 100%;
+  height: 1px;
+  margin-top: auto;
+
+  background: rgba(255, 255, 255, 0.07);
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* --------------------------------
+   Empty / Error States
+-------------------------------- */
+
+.projects-state {
+  max-width: 620px;
+  margin: 4rem auto;
+  padding: 3rem 2rem;
+
+  text-align: center;
+
+  background: #171717;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.projects-state h2 {
+  margin: 0 0 0.75rem;
+
+  color: #ffffff;
+
+  font-size: 1.3rem;
+}
+
+.projects-state p {
+  margin: 0;
+
+  color: #8f8f8f;
+
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.projects-state--error {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* --------------------------------
+   Accent / Selection
+-------------------------------- */
+
+.projects-page ::selection {
+  background: rgba(0, 112, 243, 0.25);
+  color: #ffffff;
+}
+
+/* --------------------------------
+   Tablet
+-------------------------------- */
+
+@media (max-width: 850px) {
+  .projects-page {
+    padding: 4rem 1.5rem 5rem;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------
+   Mobile
+-------------------------------- */
+
+@media (max-width: 600px) {
+  .projects-page {
+    padding: 3rem 1rem 4rem;
+  }
+
+  .projects-page__header {
+    margin-bottom: 2.5rem;
+  }
+
+  .projects-page__title {
+    font-size: 2.5rem;
+  }
+
+  .projects-page__subtitle {
+    font-size: 0.9rem;
+  }
+
+  .projects-grid {
+    gap: 1rem;
+  }
+
+  .project-skeleton {
+    min-height: 340px;
+    padding: 1.4rem;
+    border-radius: 12px;
+  }
+}
+
+/* --------------------------------
+   Reduced Motion
+-------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .project-skeleton__eyebrow,
+  .project-skeleton__title,
+  .project-skeleton__tech span,
+  .project-skeleton__text span {
+    animation: none;
+  }
 }
