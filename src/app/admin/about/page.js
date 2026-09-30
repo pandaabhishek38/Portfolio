@@ -118,6 +118,15 @@ export default function AdminAboutPage() {
         }
       )
 
+      // The summary is read without auth, so an expired/invalid token only
+      // surfaces here (401/403). Send the admin back to log in.
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem('token')
+        alert('Your admin session has expired. Please log in again.')
+        router.push('/admin/login')
+        return
+      }
+
       if (!res.ok) throw new Error('Failed to update summary')
 
       const updated = await res.json()
