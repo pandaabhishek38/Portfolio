@@ -1,5 +1,6 @@
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
+import { getOrderedSkills } from '../utils/ordering.js'
 
 const router = express.Router()
 const prisma = new PrismaClient()
@@ -26,10 +27,10 @@ router.get('/education', async (req, res) => {
   }
 })
 
-// GET skills
+// GET skills (category order, then order within category; adds typeOrder)
 router.get('/skills', async (req, res) => {
   try {
-    const skills = await prisma.skill.findMany()
+    const skills = await getOrderedSkills(prisma)
     res.json(skills)
   } catch (err) {
     console.error('❌ Failed to fetch skills:', err)
@@ -42,7 +43,7 @@ router.get('/', async (req, res) => {
   try {
     const summary = await prisma.aboutSummary.findFirst()
     const education = await prisma.education.findMany()
-    const skills = await prisma.skill.findMany()
+    const skills = await getOrderedSkills(prisma)
 
     res.json({ summary, education, skills })
   } catch (err) {

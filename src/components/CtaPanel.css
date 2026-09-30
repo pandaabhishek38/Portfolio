@@ -1,0 +1,65 @@
+/* =========================================================
+   CTA PANEL
+   Neutral secondary panel, shared by Home and About.
+   ========================================================= */
+
+.cta-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem 2rem;
+
+  padding: 32px 36px;
+
+  background: #171717;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+}
+
+.cta-panel__text {
+  max-width: 620px;
+}
+
+.cta-panel__title {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(1.3rem, 2.2vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.cta-panel__body {
+  margin: 0.6rem 0 0;
+
+  color: #8f8f8f;
+
+  font-size: 0.98rem;
+  line-height: 1.65;
+}
+
+.cta-panel .ui-button {
+  flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+  .cta-panel {
+    flex-direction: column;
+    align-items: flex-start;
+
+    padding: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cta-panel {
+    border-radius: 14px;
+  }
+
+  .cta-panel .ui-button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

@@ -1,29 +1,68 @@
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import verifyToken from '../middleware/verifyToken.js'
+import { sanitizeRichText } from '../utils/richText.js'
+import {
+  DISPLAY_ORDER,
+  applyDisplayOrder,
+  nextDisplayOrder,
+  parseOrderedIds,
+  sameMembers,
+} from '../utils/ordering.js'
 
 const prisma = new PrismaClient()
 const router = express.Router()
 
 router.use(verifyToken)
 
-// CREATE Experience
+// CREATE Experience (appended at the end of the current order)
 router.post('/', async (req, res) => {
   const { company, role, period, location, description } = req.body
   try {
+    const displayOrder = await nextDisplayOrder(prisma.experience)
     const created = await prisma.experience.create({
       data: {
         company,
         role,
         period,
         location,
-        description,
+        description: sanitizeRichText(description),
+        displayOrder,
       },
     })
     res.status(201).json(created)
   } catch (err) {
-    console.error('❌ Failed to add experience:', err)
+    console.error('Failed to add experience:', err)
     res.status(500).json({ error: 'Failed to add experience' })
+  }
+})
+
+// REORDER Experience: { orderedIds: [id, ...] } must list every entry once
+router.put('/order', async (req, res) => {
+  const orderedIds = parseOrderedIds(req.body?.orderedIds)
+  if (!orderedIds) {
+    return res
+      .status(400)
+      .json({ error: 'orderedIds must be an array of unique experience ids' })
+  }
+
+  try {
+    const existing = await prisma.experience.findMany({ select: { id: true } })
+    if (!sameMembers(existing.map((e) => e.id), orderedIds)) {
+      return res.status(400).json({
+        error: 'orderedIds must include every experience entry exactly once',
+      })
+    }
+
+    await applyDisplayOrder(prisma, prisma.experience, orderedIds)
+
+    const experiences = await prisma.experience.findMany({
+      orderBy: DISPLAY_ORDER,
+    })
+    res.json(experiences)
+  } catch (err) {
+    console.error('Failed to reorder experience:', err)
+    res.status(500).json({ error: 'Failed to save experience order' })
   }
 })
 
@@ -39,12 +78,13 @@ router.put('/:id', async (req, res) => {
         role,
         period,
         location,
-        description,
+        description:
+          description === undefined ? undefined : sanitizeRichText(description),
       },
     })
     res.json(updated)
   } catch (err) {
-    console.error('❌ Failed to update experience:', err)
+    console.error('Failed to update experience:', err)
     res.status(500).json({ error: 'Failed to update experience' })
   }
 })
@@ -56,7 +96,7 @@ router.delete('/:id', async (req, res) => {
     await prisma.experience.delete({ where: { id: parseInt(id) } })
     res.json({ message: 'Experience deleted successfully' })
   } catch (err) {
-    console.error('❌ Failed to delete experience:', err)
+    console.error('Failed to delete experience:', err)
     res.status(500).json({ error: 'Failed to delete experience' })
   }
 })

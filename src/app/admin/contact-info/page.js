@@ -42,7 +42,7 @@ export default function AdminContactInfoPage() {
         setEditData(parsed)
       })
       .catch((err) => {
-        console.error('❌ Fetch error:', err)
+        console.error('Fetch error:', err)
         setError('Failed to load contact info.')
       })
   }, [router])
@@ -68,7 +68,7 @@ export default function AdminContactInfoPage() {
 
       if (!res.ok) throw new Error('Update failed')
 
-      // 🔄 RE-FETCH full contact info here after update
+      // RE-FETCH full contact info here after update
       const updatedRes = await fetch(`${baseURL}/api/admin/contactinfo`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -92,7 +92,7 @@ export default function AdminContactInfoPage() {
       setContact(parsed)
       setEditMode(false)
     } catch (err) {
-      console.error('❌ Update failed:', err)
+      console.error('Update failed:', err)
       alert('Failed to update contact info.')
     }
   }
@@ -100,7 +100,7 @@ export default function AdminContactInfoPage() {
   return (
     <main style={{ padding: '2rem' }}>
       <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>
-        📇 Contact Info
+        Contact Info
       </h1>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -135,7 +135,7 @@ export default function AdminContactInfoPage() {
               cursor: 'pointer',
             }}
           >
-            ✏️ Edit
+            Edit
           </button>
         </div>
       )}
@@ -183,10 +183,10 @@ export default function AdminContactInfoPage() {
 
           <div style={{ marginTop: '1rem' }}>
             <button type="submit" style={{ marginRight: '1rem' }}>
-              ✅ Save
+              Save
             </button>
             <button type="button" onClick={() => setEditMode(false)}>
-              ❌ Cancel
+              Cancel
             </button>
           </div>
         </form>

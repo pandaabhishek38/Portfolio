@@ -1,3 +1,9 @@
+/* Dark page ground so the white headings stay readable in light OS mode.
+   Scoped to this page only; Navbar/Footer keep their own backgrounds. */
+body:has(.projects-page) {
+  background-color: #121212;
+}
+
 .projects-page {
   width: 100%;
   max-width: 1200px;

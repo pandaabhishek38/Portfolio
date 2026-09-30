@@ -1,152 +1,219 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { FaGithub, FaLinkedin } from 'react-icons/fa'
+import {
+  FiArrowUpRight,
+  FiLink,
+  FiMail,
+  FiMapPin,
+  FiPhone,
+} from 'react-icons/fi'
+import ContactForm from '../../components/ContactForm'
 import './contact.css'
+
+const CHANNEL_ICONS = {
+  email: FiMail,
+  phone: FiPhone,
+  address: FiMapPin,
+  location: FiMapPin,
+  github: FaGithub,
+  linkedin: FaLinkedin,
+}
+
+function withProtocol(link) {
+  return /^[a-z][a-z0-9+.-]*:/i.test(link) ? link : `https://${link}`
+}
+
+/**
+ * Work out how a ContactItem should be linked.
+ * Uses item.url when present, otherwise the visible value.
+ */
+function getChannelLink(item) {
+  const label = item.label.trim().toLowerCase()
+  const value = item.value.trim()
+  const target = (item.url || '').trim() || value
+
+  if (label === 'email') {
+    return {
+      href: target.startsWith('mailto:') ? target : `mailto:${target}`,
+      external: false,
+    }
+  }
+
+  if (label === 'phone') {
+    return {
+      href: target.startsWith('tel:')
+        ? target
+        : `tel:${target.replace(/[^\d+]/g, '')}`,
+      external: false,
+    }
+  }
+
+  if (label === 'github' || label === 'linkedin') {
+    return { href: withProtocol(target), external: true }
+  }
+
+  // Other items (e.g. Address) only link when an explicit URL is provided.
+  if ((item.url || '').trim()) {
+    return { href: withProtocol(target), external: true }
+  }
+
+  return null
+}
+
+function ContactChannel({ item }) {
+  const Icon = CHANNEL_ICONS[item.label.trim().toLowerCase()] || FiLink
+  const link = getChannelLink(item)
+
+  const content = (
+    <>
+      <span className="contact-channel__icon" aria-hidden="true">
+        <Icon />
+      </span>
+
+      <span className="contact-channel__text">
+        <span className="contact-channel__label">{item.label}</span>
+        <span className="contact-channel__value">{item.value}</span>
+      </span>
+
+      {link?.external && (
+        <>
+          <FiArrowUpRight
+            className="contact-channel__external"
+            aria-hidden="true"
+          />
+          <span className="sr-only"> (opens in a new tab)</span>
+        </>
+      )}
+    </>
+  )
+
+  if (!link) {
+    return <div className="contact-channel">{content}</div>
+  }
+
+  return (
+    <a
+      className="contact-channel contact-channel--link"
+      href={link.href}
+      {...(link.external
+        ? { target: '_blank', rel: 'noopener noreferrer' }
+        : {})}
+    >
+      {content}
+    </a>
+  )
+}
 
 export default function ContactPage() {
   const [contactInfo, setContactInfo] = useState([])
-  const [showForm, setShowForm] = useState(false)
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
-  const [status, setStatus] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
     fetch(`${baseURL}/api/contact-info`)
-      .then((res) => res.json())
-      .then((data) => setContactInfo(data))
-      .catch((err) => console.error('Contact info fetch error:', err))
-  }, [])
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch contact info: ${res.status}`)
+        }
 
-  const toggleForm = () => {
-    setShowForm((prev) => !prev)
-  }
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    if (
-      !formData.name.trim() ||
-      !formData.email.trim() ||
-      !formData.message.trim()
-    ) {
-      setStatus('All fields are required ❌')
-      return
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.email)) {
-      setStatus('Please enter a valid email address ❌')
-      return
-    }
-
-    if (formData.message.trim().length < 10) {
-      setStatus('Message should be at least 10 characters long ❌')
-      return
-    }
-
-    try {
-      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
-      const res = await fetch(`${baseURL}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        return res.json()
       })
+      .then((data) => {
+        const visibleItems = (Array.isArray(data) ? data : [])
+          .filter(
+            (item) =>
+              typeof item?.label === 'string' &&
+              typeof item?.value === 'string' &&
+              item.value.trim() !== ''
+          )
+          .sort((a, b) => a.id - b.id)
 
-      const data = await res.json()
-
-      if (res.ok) {
-        setStatus('Message sent successfully ✅')
-        setFormData({ name: '', email: '', message: '' })
-      } else {
-        setStatus(data.error || 'Failed to send message ❌')
-      }
-    } catch (error) {
-      console.error('Submission error:', error)
-      setStatus('Something went wrong ❌')
-    }
-  }
+        setContactInfo(visibleItems)
+        setError(false)
+      })
+      .catch((err) => {
+        console.error('Contact info fetch error:', err)
+        setError(true)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
 
   return (
     <main className="contact-page">
-      <h1 className="contact-title">Contact Me</h1>
-      <p>You can reach me through any of the following ways:</p>
+      <header className="contact-page__header">
+        <span className="contact-page__eyebrow">CONTACT</span>
 
-      <ul className="contact-info">
-        {contactInfo.map((item) => (
-          <li key={item.id}>
-            <strong>{item.label}:</strong>{' '}
-            {item.label === 'GitHub' || item.label === 'LinkedIn' ? (
-              <a
-                href={
-                  item.value.startsWith('http')
-                    ? item.value
-                    : `https://${item.value}`
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {item.value}
-              </a>
-            ) : (
-              item.value
-            )}
-          </li>
-        ))}
-      </ul>
+        <h1 className="contact-page__title">Let&apos;s talk</h1>
 
-      <button className="toggle-form-btn" onClick={toggleForm}>
-        {showForm ? 'Hide Message Form' : 'Send Me a Message'}
-      </button>
+        <p className="contact-page__subtitle">
+          Open to new roles, collaborations, and questions. Reach out directly
+          or send a message.
+        </p>
+      </header>
 
-      {showForm && (
-        <form className="contact-form" onSubmit={handleSubmit}>
-          <label>
-            Your Name:
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </label>
+      <div className="contact-layout">
+        <section
+          className="contact-channels"
+          aria-labelledby="contact-channels-title"
+        >
+          <h2 id="contact-channels-title" className="contact-section-title">
+            Reach me directly
+          </h2>
 
-          <label>
-            Your Email:
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </label>
+          {loading && (
+            <div
+              className="contact-channels__list"
+              aria-label="Loading contact details"
+            >
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="contact-channel contact-channel--skeleton"
+                  aria-hidden="true"
+                >
+                  <span className="contact-skeleton__icon" />
 
-          <label>
-            Your Message:
-            <textarea
-              name="message"
-              rows="5"
-              value={formData.message}
-              onChange={handleChange}
-              required
-            />
-          </label>
+                  <span className="contact-skeleton__text">
+                    <span />
+                    <span />
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
 
-          <button type="submit" className="submit-btn">
-            Send
-          </button>
-        </form>
-      )}
+          {!loading && error && (
+            <p className="contact-channels__note">
+              Contact details couldn&apos;t be loaded right now. You can still
+              send a message using the form.
+            </p>
+          )}
 
-      {status && (
-        <p style={{ marginTop: '1rem', fontWeight: 'bold' }}>{status}</p>
-      )}
+          {!loading && !error && contactInfo.length === 0 && (
+            <p className="contact-channels__note">
+              The quickest way to reach me is the message form.
+            </p>
+          )}
+
+          {!loading && !error && contactInfo.length > 0 && (
+            <ul className="contact-channels__list">
+              {contactInfo.map((item) => (
+                <li key={item.id}>
+                  <ContactChannel item={item} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <ContactForm />
+      </div>
     </main>
   )
 }

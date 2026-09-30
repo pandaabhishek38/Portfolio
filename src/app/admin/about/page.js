@@ -2,7 +2,38 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import RichText from '../../../components/RichText'
+import RichTextEditor from '../../../components/admin/RichTextEditor'
+import ReorderButtons from '../../../components/admin/ReorderButtons'
+import useOrderSaver, {
+  OrderStatus,
+  moveItem,
+} from '../../../components/admin/useOrderSaver'
+import { sortSkills } from '../../../utils/fetchJson'
+import '../../../components/admin/AdminUI.css'
 import './AboutPage.css'
+
+/* Skills in saved order (category order, then order within category). */
+async function fetchSkills() {
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const res = await fetch(`${baseURL}/api/about/skills`)
+  if (!res.ok) throw new Error(`Failed to fetch skills: ${res.status}`)
+
+  const data = await res.json()
+  return Array.isArray(data) ? sortSkills(data) : []
+}
+
+/* [{ type, skills }] in the order the skills are already sorted. */
+function groupByType(skills) {
+  const groups = new Map()
+
+  for (const skill of skills) {
+    if (!groups.has(skill.type)) groups.set(skill.type, [])
+    groups.get(skill.type).push(skill)
+  }
+
+  return [...groups.entries()].map(([type, items]) => ({ type, skills: items }))
+}
 
 export default function AdminAboutPage() {
   const router = useRouter()
@@ -12,7 +43,7 @@ export default function AdminAboutPage() {
   const [education, setEducation] = useState([])
   const [skills, setSkills] = useState([])
   const [editMode, setEditMode] = useState(false)
-  const [error, setError] = useState(null)
+  const { saving, status, saveOrder } = useOrderSaver()
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -26,7 +57,7 @@ export default function AdminAboutPage() {
         if (data.length > 0) {
           setSummary(data[0].content)
           setEditSummary(data[0].content)
-          setSummaryId(data[0].id) // ✅ Capture the ID here
+          setSummaryId(data[0].id) // Capture the ID here
         } else {
           setSummary('')
           setEditSummary('')
@@ -40,9 +71,9 @@ export default function AdminAboutPage() {
       .then((data) => setEducation(data))
 
     // Fetch Skills
-    fetch(`${baseURL}/api/about/skills`)
-      .then((res) => res.json())
-      .then((data) => setSkills(data))
+    fetchSkills()
+      .then(setSkills)
+      .catch((err) => console.error('Skills fetch error:', err))
   }, [router])
 
   const [editEducationId, setEditEducationId] = useState(null)
@@ -75,7 +106,7 @@ export default function AdminAboutPage() {
     try {
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const res = await fetch(
-        `${baseURL}/api/admin/about/summary/${summaryId}`, // ✅ Dynamic ID
+        `${baseURL}/api/admin/about/summary/${summaryId}`, // Dynamic ID
         {
           method: 'PUT',
           headers: {
@@ -90,9 +121,10 @@ export default function AdminAboutPage() {
 
       const updated = await res.json()
       setSummary(updated.content)
+      setEditSummary(updated.content)
       setEditMode(false)
     } catch (err) {
-      console.error('❌ Failed to update summary:', err)
+      console.error('Failed to update summary:', err)
       alert('Update failed')
     }
   }
@@ -147,7 +179,7 @@ export default function AdminAboutPage() {
       )
       handleCancelEdit()
     } catch (err) {
-      console.error('❌ Education update failed:', err)
+      console.error('Education update failed:', err)
       alert('Failed to update education')
     }
   }
@@ -171,7 +203,7 @@ export default function AdminAboutPage() {
 
       setEducation((prev) => prev.filter((e) => e.id !== id))
     } catch (err) {
-      console.error('❌ Education delete failed:', err)
+      console.error('Education delete failed:', err)
       alert('Failed to delete education')
     }
   }
@@ -209,7 +241,7 @@ export default function AdminAboutPage() {
       })
       setShowAddForm(false)
     } catch (err) {
-      console.error('❌ Add education failed:', err)
+      console.error('Add education failed:', err)
       alert('Failed to add education')
     }
   }
@@ -254,11 +286,11 @@ export default function AdminAboutPage() {
 
       if (!res.ok) throw new Error('Failed to update skill')
 
-      const updated = await res.json()
-      setSkills((prev) => prev.map((s) => (s.id === editSkillId ? updated : s)))
+      // Reload so a category change is reflected in the saved order
+      setSkills(await fetchSkills())
       cancelSkillEdit()
     } catch (err) {
-      console.error('❌ Skill update failed:', err)
+      console.error('Skill update failed:', err)
       alert('Failed to update skill')
     }
   }
@@ -282,7 +314,7 @@ export default function AdminAboutPage() {
 
       setSkills((prev) => prev.filter((s) => s.id !== id))
     } catch (err) {
-      console.error('❌ Delete skill failed:', err)
+      console.error('Delete skill failed:', err)
       alert('Failed to delete skill')
     }
   }
@@ -301,42 +333,105 @@ export default function AdminAboutPage() {
 
       if (!res.ok) throw new Error('Failed to add skill')
 
-      const added = await res.json()
-      setSkills((prev) => [...prev, added])
+      // Reload so the new skill appears at the end of its category
+      setSkills(await fetchSkills())
       setNewSkill({ name: '', type: '' })
       setShowSkillAddForm(false)
     } catch (err) {
-      console.error('❌ Add skill failed:', err)
+      console.error('Add skill failed:', err)
       alert('Failed to add skill')
     }
   }
 
+  const skillGroups = groupByType(skills)
+
+  const handleMoveGroup = (from, to) => {
+    const previous = skills
+    const orderedTypes = moveItem(
+      skillGroups.map((group) => group.type),
+      from,
+      to
+    )
+
+    saveOrder({
+      path: '/api/admin/about/skill-types/order',
+      body: { orderedTypes },
+      apply: () =>
+        setSkills((prev) =>
+          sortSkills(
+            prev.map((s) => ({ ...s, typeOrder: orderedTypes.indexOf(s.type) }))
+          )
+        ),
+      revert: () => setSkills(previous),
+      successMessage: 'Category order saved.',
+    }).then((saved) => {
+      if (Array.isArray(saved)) setSkills(sortSkills(saved))
+    })
+  }
+
+  const handleMoveSkill = (group, from, to) => {
+    const previous = skills
+    const orderedIds = moveItem(
+      group.skills.map((skill) => skill.id),
+      from,
+      to
+    )
+
+    saveOrder({
+      path: '/api/admin/about/skills/order',
+      body: { type: group.type, orderedIds },
+      apply: () =>
+        setSkills((prev) =>
+          sortSkills(
+            prev.map((s) =>
+              orderedIds.includes(s.id)
+                ? { ...s, displayOrder: orderedIds.indexOf(s.id) }
+                : s
+            )
+          )
+        ),
+      revert: () => setSkills(previous),
+      successMessage: `Skill order saved for ${group.type}.`,
+    }).then((saved) => {
+      if (Array.isArray(saved)) setSkills(sortSkills(saved))
+    })
+  }
+
   return (
     <main className="admin-about">
-      <h1>📝 Manage About Me</h1>
+      <h1>Manage About Me</h1>
 
       <section className="admin-section">
         <h2>Summary</h2>
         {editMode ? (
           <>
-            <textarea
+            <RichTextEditor
+              id="about-summary"
+              label="Summary"
+              legacy="paragraphs"
               value={editSummary}
-              onChange={(e) => setEditSummary(e.target.value)}
-              rows={6}
-              style={{ width: '100%' }}
+              onChange={setEditSummary}
             />
             <button onClick={handleSummarySave} className="save">
-              ✅ Save
+              Save
             </button>
-            <button onClick={() => setEditMode(false)} className="cancel">
-              ❌ Cancel
+            <button
+              onClick={() => {
+                setEditSummary(summary)
+                setEditMode(false)
+              }}
+              className="cancel"
+            >
+              Cancel
             </button>
           </>
         ) : (
           <>
-            <p>{summary}</p>
+            <div className="admin-rich-preview rich-text">
+              <RichText value={summary} legacy="paragraphs" />
+            </div>
             <button onClick={() => setEditMode(true)} className="edit">
-              ✏️ Edit
+              Edit
             </button>
           </>
         )}
@@ -391,10 +486,10 @@ export default function AdminAboutPage() {
               />
               <div className="button-row">
                 <button className="save" onClick={handleEducationUpdate}>
-                  ✅ Save
+                  Save
                 </button>
                 <button className="cancel" onClick={handleCancelEdit}>
-                  ❌ Cancel
+                  Cancel
                 </button>
               </div>
             </div>
@@ -411,13 +506,13 @@ export default function AdminAboutPage() {
               </p>
               <div className="button-row">
                 <button className="edit" onClick={() => handleEditClick(edu)}>
-                  ✏️ Edit
+                  Edit
                 </button>
                 <button
                   className="delete"
                   onClick={() => handleDeleteEducation(edu.id)}
                 >
-                  🗑️ Delete
+                  Delete
                 </button>
               </div>
             </div>
@@ -470,68 +565,114 @@ export default function AdminAboutPage() {
             />
             <div className="button-row">
               <button className="save" onClick={handleAddEducation}>
-                ✅ Add
+                Add
               </button>
               <button className="cancel" onClick={() => setShowAddForm(false)}>
-                ❌ Cancel
+                Cancel
               </button>
             </div>
           </div>
         ) : (
           <button className="add" onClick={() => setShowAddForm(true)}>
-            ➕ Add Education
+            Add Education
           </button>
         )}
       </section>
 
       <section className="admin-section">
         <h2>Skills</h2>
+        <p className="admin-hint">
+          Categories and the skills inside them appear on the About page in
+          this order.
+        </p>
 
-        {skills.map((skill) =>
-          skill.id === editSkillId ? (
-            <div key={skill.id} className="admin-card">
-              <input
-                type="text"
-                name="name"
-                value={skillForm.name}
-                onChange={handleSkillFormChange}
-                placeholder="Skill Name"
+        <OrderStatus status={status} saving={saving} />
+
+        <datalist id="skill-type-options">
+          {skillGroups.map((group) => (
+            <option key={group.type} value={group.type} />
+          ))}
+        </datalist>
+
+        {skillGroups.map((group, groupIndex) => (
+          <div key={group.type} className="admin-skill-group">
+            <div className="admin-item-head">
+              <h3 className="admin-skill-group__title">{group.type}</h3>
+              <ReorderButtons
+                index={groupIndex}
+                count={skillGroups.length}
+                label={`category ${group.type}`}
+                onMove={handleMoveGroup}
+                disabled={saving}
               />
-              <input
-                type="text"
-                name="type"
-                value={skillForm.type}
-                onChange={handleSkillFormChange}
-                placeholder="Skill Type"
-              />
-              <div className="button-row">
-                <button className="save" onClick={handleUpdateSkill}>
-                  ✅ Save
-                </button>
-                <button className="cancel" onClick={cancelSkillEdit}>
-                  ❌ Cancel
-                </button>
-              </div>
             </div>
-          ) : (
-            <div key={skill.id} className="admin-card">
-              <p>
-                <strong>{skill.name}</strong> ({skill.type})
-              </p>
-              <div className="button-row">
-                <button className="edit" onClick={() => startSkillEdit(skill)}>
-                  ✏️ Edit
-                </button>
-                <button
-                  className="delete"
-                  onClick={() => deleteSkill(skill.id)}
-                >
-                  🗑️ Delete
-                </button>
-              </div>
-            </div>
-          )
-        )}
+
+            <ul className="admin-skill-list">
+              {group.skills.map((skill, skillIndex) => (
+                <li key={skill.id} className="admin-card">
+                  {skill.id === editSkillId ? (
+                    <>
+                      <input
+                        type="text"
+                        name="name"
+                        value={skillForm.name}
+                        onChange={handleSkillFormChange}
+                        placeholder="Skill Name"
+                        aria-label="Skill name"
+                      />
+                      <input
+                        type="text"
+                        name="type"
+                        list="skill-type-options"
+                        value={skillForm.type}
+                        onChange={handleSkillFormChange}
+                        placeholder="Skill Category"
+                        aria-label="Skill category"
+                      />
+                      <div className="button-row">
+                        <button className="save" onClick={handleUpdateSkill}>
+                          Save
+                        </button>
+                        <button className="cancel" onClick={cancelSkillEdit}>
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="admin-skill-row">
+                      <strong>{skill.name}</strong>
+
+                      <ReorderButtons
+                        index={skillIndex}
+                        count={group.skills.length}
+                        label={skill.name}
+                        onMove={(from, to) =>
+                          handleMoveSkill(group, from, to)
+                        }
+                        disabled={saving}
+                      />
+
+                      <div className="button-row">
+                        <button
+                          className="edit"
+                          onClick={() => startSkillEdit(skill)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="delete"
+                          onClick={() => deleteSkill(skill.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
 
         {showSkillAddForm ? (
           <div className="admin-card">
@@ -541,29 +682,32 @@ export default function AdminAboutPage() {
               value={newSkill.name}
               onChange={handleNewSkillChange}
               placeholder="Skill Name"
+              aria-label="Skill name"
             />
             <input
               type="text"
               name="type"
+              list="skill-type-options"
               value={newSkill.type}
               onChange={handleNewSkillChange}
-              placeholder="Skill Type"
+              placeholder="Skill Category"
+              aria-label="Skill category"
             />
             <div className="button-row">
               <button className="save" onClick={addSkill}>
-                ✅ Add
+                Add
               </button>
               <button
                 className="cancel"
                 onClick={() => setShowSkillAddForm(false)}
               >
-                ❌ Cancel
+                Cancel
               </button>
             </div>
           </div>
         ) : (
           <button className="add" onClick={() => setShowSkillAddForm(true)}>
-            ➕ Add Skill
+            Add Skill
           </button>
         )}
       </section>

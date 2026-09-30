@@ -1,49 +1,367 @@
+/* Dark page ground so the white headings stay readable in light OS mode.
+   Scoped to this page only; Navbar/Footer keep their own backgrounds. */
+body:has(.experience-page) {
+  background-color: #121212;
+}
+
 .experience-page {
-  padding: 2rem;
-  max-width: 900px;
+  width: 100%;
+  max-width: 920px;
   margin: 0 auto;
+  padding: 5rem 2rem 6rem;
+
+  color: #f5f5f5;
 }
 
-.experience-heading {
+/* --------------------------------
+   Page Header
+-------------------------------- */
+
+.experience-page__header {
+  max-width: 760px;
+  margin: 0 auto 3.5rem;
+
   text-align: center;
-  font-size: 2.5rem;
-  margin-bottom: 3rem;
-  color: #f7f5f5;
 }
 
-.experience-entry {
-  position: relative;
-  background: #f4f4f4;
-  border-left: 4px solid #0070f3;
-  padding: 1.5rem 1.5rem 1.5rem 2rem;
-  margin-bottom: 2rem;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease;
+.experience-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+
+  color: #0070f3;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.experience-entry:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-}
-
-.experience-entry h2 {
+.experience-page__title {
   margin: 0;
-  font-size: 1.6rem;
-  color: #333;
+
+  color: #ffffff;
+
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
 }
 
-.experience-entry p {
-  margin: 0.5rem 0 1rem;
-  color: #666;
-  font-weight: 500;
-  line-height: 1.6;
-}
+.experience-page__subtitle {
+  max-width: 620px;
+  margin: 1rem auto 0;
 
-.experience-description {
-  white-space: pre-line;
-  color: #333;
+  color: #8f8f8f;
+
   font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* --------------------------------
+   Timeline
+-------------------------------- */
+
+.experience-timeline {
+  --timeline-gutter: 44px;
+  --timeline-line-x: 9px;
+  --timeline-dot-size: 14px;
+  --timeline-dot-top: 32px;
+
+  position: relative;
+
+  margin: 0;
+  padding: 0 0 0 var(--timeline-gutter);
+
+  list-style: none;
+}
+
+/* Thin vertical rail */
+.experience-timeline::before {
+  content: '';
+
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: calc(var(--timeline-line-x) - 1px);
+
+  width: 2px;
+
+  border-radius: 2px;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(154, 230, 180, 0.4),
+    rgba(255, 255, 255, 0.08)
+  );
+}
+
+.experience-timeline__item {
+  position: relative;
+
+  margin-bottom: 1.5rem;
+}
+
+.experience-timeline__item:last-child {
+  margin-bottom: 0;
+}
+
+/* Dot aligned with each card's eyebrow line */
+.experience-timeline__dot {
+  position: absolute;
+  top: var(--timeline-dot-top);
+  left: calc(
+    var(--timeline-line-x) - (var(--timeline-dot-size) / 2) -
+      var(--timeline-gutter)
+  );
+
+  width: var(--timeline-dot-size);
+  height: var(--timeline-dot-size);
+
+  box-sizing: border-box;
+
+  border: 2px solid #9ae6b4;
+  border-radius: 50%;
+
+  background: #121212;
+
+  /* Cuts the rail around the dot */
+  box-shadow: 0 0 0 4px #121212;
+
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+
+.experience-timeline__item:hover .experience-timeline__dot,
+.experience-timeline__item:focus-within .experience-timeline__dot {
+  border-color: #007aff;
+  background: #0f1f33;
+  box-shadow:
+    0 0 0 4px #121212,
+    0 0 12px rgba(0, 122, 255, 0.45);
+}
+
+.experience-timeline--loading .experience-timeline__dot {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --------------------------------
+   Loading Skeletons
+-------------------------------- */
+
+.experience-skeleton {
+  display: flex;
+  flex-direction: column;
+
+  padding: 30px;
+
+  background: #171717;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+
+  overflow: hidden;
+}
+
+.experience-skeleton__eyebrow,
+.experience-skeleton__title,
+.experience-skeleton__org,
+.experience-skeleton__text span {
+  animation: experience-skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+.experience-skeleton__eyebrow {
+  width: 140px;
+  height: 10px;
+  margin-bottom: 1rem;
+
+  border-radius: 4px;
+
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.experience-skeleton__title {
+  width: 55%;
+  height: 24px;
+  margin-bottom: 0.75rem;
+
+  border-radius: 5px;
+
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.experience-skeleton__org {
+  width: 40%;
+  height: 12px;
+  margin-bottom: 1.5rem;
+
+  border-radius: 4px;
+
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.experience-skeleton__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.experience-skeleton__text span {
+  width: 100%;
+  height: 12px;
+
+  border-radius: 4px;
+
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.experience-skeleton__text span:nth-child(2) {
+  width: 90%;
+}
+
+.experience-skeleton__text span:nth-child(3) {
+  width: 75%;
+}
+
+@keyframes experience-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* --------------------------------
+   Empty / Error States
+-------------------------------- */
+
+.experience-state {
+  max-width: 620px;
+  margin: 4rem auto;
+  padding: 3rem 2rem;
+
+  text-align: center;
+
+  background: #171717;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.experience-state h2 {
+  margin: 0 0 0.75rem;
+
+  color: #ffffff;
+
+  font-size: 1.3rem;
+}
+
+.experience-state p {
+  margin: 0;
+
+  color: #8f8f8f;
+
+  font-size: 0.95rem;
   line-height: 1.6;
-  margin-top: 0.5rem;
+}
+
+.experience-state--error {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* --------------------------------
+   Accent / Selection
+-------------------------------- */
+
+.experience-page ::selection {
+  background: rgba(0, 112, 243, 0.25);
+  color: #ffffff;
+}
+
+/* --------------------------------
+   Tablet
+-------------------------------- */
+
+@media (max-width: 850px) {
+  .experience-page {
+    padding: 4rem 1.5rem 5rem;
+  }
+}
+
+/* Card padding steps down at 900px (see ExperienceCard.css) */
+@media (max-width: 900px) {
+  .experience-timeline {
+    --timeline-dot-top: 29px;
+  }
+
+  .experience-skeleton {
+    padding: 26px;
+  }
+}
+
+/* --------------------------------
+   Mobile
+-------------------------------- */
+
+@media (max-width: 600px) {
+  .experience-page {
+    padding: 3rem 1rem 4rem;
+  }
+
+  .experience-page__header {
+    margin-bottom: 2.5rem;
+  }
+
+  .experience-page__title {
+    font-size: 2.5rem;
+  }
+
+  .experience-page__subtitle {
+    font-size: 0.9rem;
+  }
+
+  .experience-timeline {
+    --timeline-gutter: 26px;
+    --timeline-line-x: 6px;
+    --timeline-dot-size: 12px;
+    --timeline-dot-top: 26px;
+  }
+
+  .experience-timeline__item {
+    margin-bottom: 1rem;
+  }
+
+  .experience-skeleton {
+    padding: 22px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .experience-timeline {
+    --timeline-dot-top: 22px;
+  }
+
+  .experience-skeleton {
+    padding: 18px;
+  }
+}
+
+/* --------------------------------
+   Reduced Motion
+-------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .experience-timeline__dot {
+    transition: none;
+  }
+
+  .experience-skeleton__eyebrow,
+  .experience-skeleton__title,
+  .experience-skeleton__org,
+  .experience-skeleton__text span {
+    animation: none;
+  }
 }

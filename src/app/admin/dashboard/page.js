@@ -21,27 +21,27 @@ export default function AdminDashboard() {
 
   const sections = [
     {
-      title: '📁 Projects',
+      title: 'Projects',
       path: '/admin/projects',
       description: 'View and edit projects',
     },
     {
-      title: '💼 Experience',
+      title: 'Experience',
       path: '/admin/experience',
       description: 'Manage work history',
     },
     {
-      title: '📇 Contact Info',
+      title: 'Contact Info',
       path: '/admin/contact-info',
       description: 'Edit your contact details',
     },
     {
-      title: '📬 Messages',
+      title: 'Messages',
       path: '/admin/messages',
       description: 'Read form submissions',
     },
     {
-      title: '📝 About',
+      title: 'About',
       path: '/admin/about',
       description: 'Edit About Me section',
     },
@@ -50,9 +50,9 @@ export default function AdminDashboard() {
   return (
     <main className="admin-dashboard">
       <div className="admin-header">
-        <h1>🛠️ Admin Dashboard</h1>
+        <h1>Admin Dashboard</h1>
         <button className="logout-btn" onClick={handleLogout}>
-          🚪 Logout
+          Logout
         </button>
       </div>
 

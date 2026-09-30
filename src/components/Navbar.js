@@ -1,21 +1,9 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import './Navbar.css'
 
+// The admin area is intentionally not linked here; it is reached
+// directly at /admin/login.
 export default function Navbar() {
-  const router = useRouter()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      setIsLoggedIn(true)
-    }
-  }, [])
-
   return (
     <nav className="navbar">
       <div className="navbar__logo">Abhishek Panda</div>
@@ -36,17 +24,6 @@ export default function Navbar() {
           <Link href="/contact">Contact</Link>
         </li>
       </ul>
-      <div className="navbar__admin">
-        {!isLoggedIn ? (
-          <button onClick={() => router.push('/admin/login')}>
-            Admin Login
-          </button>
-        ) : (
-          <button onClick={() => router.push('/admin/dashboard')}>
-            Admin Dashboard
-          </button>
-        )}
-      </div>
     </nav>
   )
 }

@@ -1,77 +1,150 @@
-.about-container {
-  padding: 2rem;
-  color: #f0f0f0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #000; /* Assuming dark theme */
+/* =========================================================
+   ADMIN: MANAGE ABOUT
+   Scoped to .admin-about so nothing leaks into the public
+   About page (which shares class names like .about-section).
+   ========================================================= */
+
+.admin-about {
+  max-width: 960px;
+  margin: 0 auto;
 }
 
-.about-container h1 {
-  font-size: 2.5rem;
+.admin-about h1 {
   margin-bottom: 1.5rem;
-  color: #ffffff;
-  text-align: center;
+
+  font-size: 2rem;
 }
 
-.about-container .summary {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  margin-bottom: 2.5rem;
-  color: #dddddd; /* Light gray for readability */
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.about-section {
+.admin-about .admin-section {
   margin-bottom: 2.5rem;
 }
 
-.about-section h2 {
-  font-size: 1.8rem;
+.admin-about .admin-section > h2 {
   margin-bottom: 1rem;
-  color: #f5f5f5;
-  border-bottom: 2px solid #444;
   padding-bottom: 0.5rem;
+
+  border-bottom: 2px solid #ccc;
+
+  font-size: 1.5rem;
 }
 
-.education-grid,
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+.admin-about .admin-hint {
+  margin: 0 0 0.75rem;
+
+  color: #777;
+
+  font-size: 14px;
 }
 
-.education-card,
-.skill-card {
-  background-color: #1e1e1e;
-  padding: 1.2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.05);
-  transition: transform 0.2s ease;
-  border: 1px solid #333;
+.admin-about .admin-card {
+  margin-bottom: 0.75rem;
+  padding: 1rem;
+
+  border: 1px solid #ccc;
+  border-radius: 6px;
+
+  background: #f9f9f9;
+  color: #222;
+
+  list-style: none;
 }
 
-.education-card:hover,
-.skill-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+.admin-about .admin-card input,
+.admin-about .admin-card textarea {
+  display: block;
+
+  width: 100%;
+  margin-bottom: 0.5rem;
+  box-sizing: border-box;
 }
 
-.education-card p {
-  margin: 0.4rem 0;
-  color: #cccccc;
-  font-size: 0.95rem;
+.admin-about .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  margin-top: 0.5rem;
 }
 
-.education-card p span {
+.admin-about button.save,
+.admin-about button.cancel,
+.admin-about button.edit,
+.admin-about button.delete,
+.admin-about button.add {
+  margin: 0.5rem 0.5rem 0 0;
+  padding: 0.4rem 0.9rem;
+
+  border: 1px solid #b9b9b9;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #222;
+
+  font: inherit;
+  font-size: 14px;
   font-weight: 600;
+
+  cursor: pointer;
+}
+
+.admin-about button.save,
+.admin-about button.add {
+  border-color: #0070f3;
+
+  background: #0070f3;
   color: #ffffff;
 }
 
-.skill-card {
-  text-align: center;
-  font-size: 1rem;
-  color: #eeeeee;
-  background-color: #2c2c2c;
-  font-weight: 500;
+.admin-about button.delete {
+  color: #c62828;
+}
+
+.admin-about .button-row button {
+  margin: 0;
+}
+
+/* Skill categories */
+
+.admin-about .admin-skill-group {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+
+  background: #f1f1f1;
+  color: #222;
+}
+
+.admin-about .admin-skill-group__title {
+  margin: 0;
+
+  font-size: 1.1rem;
+}
+
+.admin-about .admin-skill-list {
+  margin: 0;
+  padding: 0;
+}
+
+.admin-about .admin-skill-list .admin-card {
+  margin-bottom: 0.5rem;
+  padding: 0.6rem 0.8rem;
+
+  background: #ffffff;
+}
+
+.admin-about .admin-skill-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.admin-about .admin-skill-row strong {
+  flex: 1 1 140px;
+}
+
+.admin-about .admin-skill-row .button-row {
+  margin-top: 0;
 }

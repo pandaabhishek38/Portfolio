@@ -14,28 +14,29 @@ datasource db {
 }
 
 model Project {
-  id          Int    @id @default(autoincrement())
-  title       String
-  stack       String
-  github      String
-  description String
+  id           Int    @id @default(autoincrement())
+  title        String
+  stack        String
+  github       String
+  description  String // Sanitized rich-text HTML, or legacy newline-separated plain text
+  displayOrder Int    @default(0)
 }
 
 model Experience {
-  id          Int     @id @default(autoincrement())
-  company     String
-  role        String
-  period      String
-  location    String
-  description String  // ✅ New field instead of bullet points
+  id           Int    @id @default(autoincrement())
+  company      String
+  role         String
+  period       String
+  location     String
+  description  String // Sanitized rich-text HTML, or legacy newline-separated plain text
+  displayOrder Int    @default(0)
 }
 
-
 model ContactItem {
-  id     Int    @id @default(autoincrement())
-  label  String
-  value  String
-  url    String?
+  id    Int     @id @default(autoincrement())
+  label String
+  value String
+  url   String?
 }
 
 model ContactMessage {
@@ -48,11 +49,11 @@ model ContactMessage {
 
 model AboutSummary {
   id      Int    @id @default(autoincrement())
-  content String
+  content String // Sanitized rich-text HTML, or legacy plain text
 }
 
 model Education {
-  id         Int    @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   university String
   degree     String
   fromYear   Int
@@ -62,9 +63,14 @@ model Education {
 }
 
 model Skill {
-  id   Int    @id @default(autoincrement())
-  name String
-  type String // e.g., Language, Framework, Tool
+  id           Int    @id @default(autoincrement())
+  name         String
+  type         String // e.g., Language, Framework, Tool
+  displayOrder Int    @default(0) // order within its type
 }
 
-
+// Display order of skill categories (Skill.type values) on the About page.
+model SkillType {
+  name         String @id
+  displayOrder Int    @default(0)
+}

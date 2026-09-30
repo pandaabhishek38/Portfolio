@@ -2,6 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import RichText from '../../../components/RichText'
+import RichTextEditor from '../../../components/admin/RichTextEditor'
+import ReorderButtons from '../../../components/admin/ReorderButtons'
+import useOrderSaver, {
+  OrderStatus,
+  moveItem,
+} from '../../../components/admin/useOrderSaver'
+import { sortByDisplayOrder } from '../../../utils/fetchJson'
+import '../../../components/admin/AdminUI.css'
 
 export default function AdminExperiencePage() {
   const router = useRouter()
@@ -26,10 +35,7 @@ export default function AdminExperiencePage() {
     description: '',
   })
 
-  const autoResize = (e) => {
-    e.target.style.height = 'auto'
-    e.target.style.height = e.target.scrollHeight + 'px'
-  }
+  const { saving, status, saveOrder } = useOrderSaver()
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -47,9 +53,9 @@ export default function AdminExperiencePage() {
           throw new Error('Unauthorized or error fetching experiences')
         return res.json()
       })
-      .then((data) => setExperiences(data))
+      .then((data) => setExperiences(sortByDisplayOrder(data)))
       .catch((err) => {
-        console.error('❌ Experience fetch error:', err)
+        console.error('Experience fetch error:', err)
         setError('You are not authorized or something went wrong.')
       })
   }, [router])
@@ -91,7 +97,7 @@ export default function AdminExperiencePage() {
       )
       setEditExperienceId(null)
     } catch (err) {
-      console.error('❌ Update failed:', err)
+      console.error('Update failed:', err)
       alert('Failed to update experience.')
     }
   }
@@ -113,7 +119,7 @@ export default function AdminExperiencePage() {
       if (!res.ok) throw new Error('Failed to delete')
       setExperiences((prev) => prev.filter((exp) => exp.id !== id))
     } catch (err) {
-      console.error('❌ Delete failed:', err)
+      console.error('Delete failed:', err)
       alert('Failed to delete experience.')
     }
   }
@@ -123,8 +129,28 @@ export default function AdminExperiencePage() {
     setNewExperience((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handleMove = (from, to) => {
+    const previous = experiences
+    const next = moveItem(experiences, from, to)
+    if (next === previous) return
+
+    saveOrder({
+      path: '/api/admin/experience/order',
+      body: { orderedIds: next.map((exp) => exp.id) },
+      apply: () => setExperiences(next),
+      revert: () => setExperiences(previous),
+      successMessage: 'Experience order saved.',
+    }).then((saved) => {
+      if (Array.isArray(saved)) setExperiences(sortByDisplayOrder(saved))
+    })
+  }
+
   const handleNewSubmit = async (e) => {
     e.preventDefault()
+    if (!newExperience.description) {
+      alert('Please add an experience description.')
+      return
+    }
     try {
       const token = localStorage.getItem('token')
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -149,7 +175,7 @@ export default function AdminExperiencePage() {
         description: '',
       })
     } catch (err) {
-      console.error('❌ Failed to add experience:', err)
+      console.error('Failed to add experience:', err)
       alert('Something went wrong.')
     }
   }
@@ -157,7 +183,7 @@ export default function AdminExperiencePage() {
   return (
     <main style={{ padding: '2rem' }}>
       <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>
-        💼 Manage Experience
+        Manage Experience
       </h1>
 
       {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
@@ -173,7 +199,7 @@ export default function AdminExperiencePage() {
           cursor: 'pointer',
         }}
       >
-        {showNewForm ? 'Cancel' : '➕ Add New Experience'}
+        {showNewForm ? 'Cancel' : 'Add New Experience'}
       </button>
 
       {showNewForm && (
@@ -214,23 +240,20 @@ export default function AdminExperiencePage() {
             required
             style={{ display: 'block', marginBottom: '0.5rem', width: '100%' }}
           />
-          <textarea
-            name="description"
+          <label
+            className="admin-field-label"
+            htmlFor="new-experience-description"
+          >
+            Description
+          </label>
+          <RichTextEditor
+            id="new-experience-description"
+            label="Experience description"
+            legacy="list"
             value={newExperience.description}
-            onChange={(e) => {
-              handleNewChange(e)
-              autoResize(e)
-            }}
-            placeholder="Experience description"
-            rows="3"
-            style={{
-              display: 'block',
-              width: '100%',
-              marginBottom: '1rem',
-              overflow: 'hidden',
-              resize: 'none',
-            }}
-            required
+            onChange={(html) =>
+              setNewExperience((prev) => ({ ...prev, description: html }))
+            }
           />
 
           <button
@@ -250,11 +273,13 @@ export default function AdminExperiencePage() {
         </form>
       )}
 
+      <OrderStatus status={status} saving={saving} />
+
       {experiences.length > 0 ? (
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {experiences.map((exp, index) => (
             <li
-              key={index}
+              key={exp.id}
               style={{
                 border: '1px solid #ccc',
                 borderRadius: '6px',
@@ -264,6 +289,16 @@ export default function AdminExperiencePage() {
                 color: '#222',
               }}
             >
+              <div className="admin-item-head">
+                <ReorderButtons
+                  index={index}
+                  count={experiences.length}
+                  label={`${exp.role} at ${exp.company}`}
+                  onMove={handleMove}
+                  disabled={saving}
+                />
+              </div>
+
               {editExperienceId === exp.id ? (
                 <>
                   <input
@@ -314,22 +349,15 @@ export default function AdminExperiencePage() {
                       marginBottom: '0.5rem',
                     }}
                   />
-                  <textarea
-                    name="description"
+                  <RichTextEditor
+                    key={`edit-experience-${exp.id}`}
+                    id={`experience-${exp.id}-description`}
+                    label="Experience description"
+                    legacy="list"
                     value={editData.description}
-                    onChange={(e) => {
-                      handleEditChange(e)
-                      autoResize(e)
-                    }}
-                    rows="3"
-                    placeholder="Edit experience description"
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      marginBottom: '1rem',
-                      overflow: 'hidden',
-                      resize: 'none',
-                    }}
+                    onChange={(html) =>
+                      setEditData((prev) => ({ ...prev, description: html }))
+                    }
                   />
 
                   <div style={{ marginTop: '0.75rem' }}>
@@ -337,10 +365,10 @@ export default function AdminExperiencePage() {
                       onClick={() => handleEditSubmit(exp.id)}
                       style={{ marginRight: '1rem' }}
                     >
-                      ✅ Save
+                      Save
                     </button>
                     <button onClick={() => setEditExperienceId(null)}>
-                      ❌ Cancel
+                      Cancel
                     </button>
                   </div>
                 </>
@@ -352,28 +380,21 @@ export default function AdminExperiencePage() {
                   <p style={{ color: '#444' }}>
                     <strong>{exp.role}</strong> | {exp.period} | {exp.location}
                   </p>
-                  <p
-                    style={{
-                      marginTop: '0.5rem',
-                      color: '#333',
-                      lineHeight: '1.6',
-                      whiteSpace: 'pre-line',
-                    }}
-                  >
-                    {exp.description}
-                  </p>
+                  <div className="admin-rich-preview rich-text">
+                    <RichText value={exp.description} legacy="list" />
+                  </div>
                   <div style={{ marginTop: '0.75rem' }}>
                     <button
                       onClick={() => handleEditClick(exp)}
                       style={{ marginRight: '1rem' }}
                     >
-                      ✏️ Edit
+                      Edit
                     </button>
                     <button
                       onClick={() => handleDelete(exp.id)}
                       style={{ color: 'red' }}
                     >
-                      🗑️ Delete
+                      Delete
                     </button>
                   </div>
                 </>

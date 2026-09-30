@@ -91,216 +91,6 @@
   min-height: 34px;
 }
 
-.project-tech-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-
-  padding: 7px 10px;
-
-  border: 1px solid #303030;
-  border-radius: 8px;
-
-  background: #202020;
-
-  color: #d6d6d6;
-
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1;
-
-  white-space: nowrap;
-
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease,
-    color 180ms ease;
-}
-
-.project-tech-badge:hover {
-  transform: translateY(-2px);
-
-  border-color: #444;
-
-  background: #252525;
-
-  color: #fff;
-}
-
-.project-tech-badge__mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 20px;
-  height: 20px;
-
-  color: #dcdcdc;
-
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1;
-
-  letter-spacing: -0.02em;
-}
-
-.project-tech-badge__name {
-  line-height: 1;
-}
-
-/* Individual technology accents */
-
-.project-tech-badge--html .project-tech-badge__mark {
-  color: #e44d26;
-}
-
-.project-tech-badge--css .project-tech-badge__mark {
-  color: #2965f1;
-}
-
-.project-tech-badge--javascript .project-tech-badge__mark {
-  color: #f7df1e;
-}
-
-.project-tech-badge--typescript .project-tech-badge__mark {
-  color: #3178c6;
-}
-
-.project-tech-badge--node .project-tech-badge__mark {
-  color: #68a063;
-}
-
-.project-tech-badge--express .project-tech-badge__mark {
-  color: #ffffff;
-}
-
-.project-tech-badge--react .project-tech-badge__mark {
-  color: #61dafb;
-}
-
-.project-tech-badge--next .project-tech-badge__mark {
-  color: #ffffff;
-}
-
-.project-tech-badge--python .project-tech-badge__mark {
-  color: #ffd343;
-}
-
-.project-tech-badge--java .project-tech-badge__mark {
-  color: #f89820;
-}
-
-.project-tech-badge--cpp .project-tech-badge__mark,
-.project-tech-badge--c .project-tech-badge__mark,
-.project-tech-badge--csharp .project-tech-badge__mark {
-  color: #659ad2;
-}
-
-.project-tech-badge--go .project-tech-badge__mark {
-  color: #00add8;
-}
-
-.project-tech-badge--php .project-tech-badge__mark {
-  color: #777bb4;
-}
-
-.project-tech-badge--mysql .project-tech-badge__mark,
-.project-tech-badge--postgresql .project-tech-badge__mark {
-  color: #4ea3d8;
-}
-
-.project-tech-badge--mongodb .project-tech-badge__mark {
-  color: #47a248;
-}
-
-.project-tech-badge--docker .project-tech-badge__mark {
-  color: #2496ed;
-}
-
-.project-tech-badge--kubernetes .project-tech-badge__mark {
-  color: #326ce5;
-}
-
-.project-tech-badge--aws .project-tech-badge__mark {
-  color: #ff9900;
-}
-
-.project-tech-badge--azure .project-tech-badge__mark {
-  color: #0078d4;
-}
-
-.project-tech-badge--vercel .project-tech-badge__mark {
-  color: #ffffff;
-}
-
-.project-tech-badge--tensorflow .project-tech-badge__mark {
-  color: #ff6f00;
-}
-
-.project-tech-badge--pytorch .project-tech-badge__mark {
-  color: #ee4c2c;
-}
-
-.project-tech-badge--keras .project-tech-badge__mark {
-  color: #d00000;
-}
-
-.project-tech-badge--sklearn .project-tech-badge__mark {
-  color: #f7931e;
-}
-
-.project-tech-badge--django .project-tech-badge__mark {
-  color: #44b78b;
-}
-
-.project-tech-badge--flask .project-tech-badge__mark {
-  color: #ffffff;
-}
-
-.project-tech-badge--prisma .project-tech-badge__mark {
-  color: #ffffff;
-}
-
-.project-tech-badge--supabase .project-tech-badge__mark {
-  color: #3ecf8e;
-}
-
-.project-tech-badge--git .project-tech-badge__mark,
-.project-tech-badge--github .project-tech-badge__mark {
-  color: #ffffff;
-}
-
-.project-tech-badge--openai .project-tech-badge__mark {
-  color: #ffffff;
-}
-
-.project-tech-badge--langchain .project-tech-badge__mark {
-  color: #1c9b63;
-}
-
-.project-tech-badge--twilio .project-tech-badge__mark {
-  color: #f22f46;
-}
-
-.project-tech-badge--generic .project-tech-badge__mark {
-  color: #aaa;
-}
-
-/* +N badge */
-
-.project-tech-badge--more {
-  min-width: 34px;
-
-  justify-content: center;
-
-  color: #999;
-
-  background: #1d1d1d;
-
-  cursor: default;
-}
-
 /* =========================================================
    DESCRIPTION
    ========================================================= */
@@ -543,11 +333,6 @@
     margin-bottom: 20px;
   }
 
-  .project-tech-badge {
-    padding: 6px 8px;
-    font-size: 11px;
-  }
-
   .project-card__description {
     font-size: 14px;
     line-height: 1.6;
@@ -587,7 +372,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .project-card,
-  .project-tech-badge,
   .project-card__more-button,
   .project-card__more-arrow,
   .project-card__github,
@@ -597,7 +381,6 @@
   }
 
   .project-card:hover,
-  .project-tech-badge:hover,
   .project-card__github:hover,
   .project-card__view:hover {
     transform: none;

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import ProjectCard from '../../components/ProjectCard'
+import { sortByDisplayOrder } from '../../utils/fetchJson'
 import './ProjectsPage.css'
 
 export default function ProjectsPage() {
@@ -21,7 +22,8 @@ export default function ProjectsPage() {
         return res.json()
       })
       .then((data) => {
-        const sortedProjects = [...data].sort((a, b) => a.id - b.id)
+        // Admin-controlled order (displayOrder, then id)
+        const sortedProjects = sortByDisplayOrder(data)
 
         setProjects(sortedProjects)
         setError(false)

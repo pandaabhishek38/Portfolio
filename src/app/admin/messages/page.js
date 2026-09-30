@@ -27,7 +27,7 @@ export default function AdminMessagesPage() {
       })
       .then((data) => setMessages(data))
       .catch((err) => {
-        console.error('❌ Fetch error:', err)
+        console.error('Fetch error:', err)
         setError('Failed to load messages.')
       })
   }, [router])
@@ -53,7 +53,7 @@ export default function AdminMessagesPage() {
       // Refresh the list after deletion
       setMessages((prev) => prev.filter((msg) => msg.id !== id))
     } catch (err) {
-      console.error('❌ Delete failed:', err)
+      console.error('Delete failed:', err)
       alert('Something went wrong while deleting.')
     }
   }
@@ -61,7 +61,7 @@ export default function AdminMessagesPage() {
   return (
     <main style={{ padding: '2rem' }}>
       <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>
-        📬 Manage Messages
+        Manage Messages
       </h1>
 
       {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
@@ -95,7 +95,7 @@ export default function AdminMessagesPage() {
                   style={{ marginRight: '1rem', color: 'red' }}
                   onClick={() => handleDelete(msg.id)}
                 >
-                  🗑️ Delete
+                  Delete
                 </button>
               </div>
             </li>

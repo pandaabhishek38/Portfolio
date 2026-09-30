@@ -1,77 +1,328 @@
-.about-container {
-  padding: 2rem;
-  color: #f0f0f0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #000; /* Assuming dark theme */
+/* Dark page ground so the white headings stay readable in light OS mode.
+   Scoped to this page only; Navbar/Footer keep their own backgrounds. */
+body:has(.about-page) {
+  background-color: #121212;
 }
 
-.about-container h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
+.about-page {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 5rem 2rem 6rem;
+
+  color: #f5f5f5;
+}
+
+.about-page ::selection {
+  background: rgba(0, 112, 243, 0.25);
   color: #ffffff;
+}
+
+/* --------------------------------
+   Page Header
+-------------------------------- */
+
+.about-page__header {
+  max-width: 760px;
+  margin: 0 auto 3.5rem;
+
   text-align: center;
 }
 
-.about-container .summary {
+.about-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+
+  color: #0070f3;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.about-page__title {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.about-page__subtitle {
+  max-width: 620px;
+  margin: 1rem auto 0;
+
+  color: #8f8f8f;
+
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* --------------------------------
+   Summary
+-------------------------------- */
+
+.about-summary {
+  --rich-text-gap: 1.1rem;
+
+  max-width: 720px;
+  margin: 0 auto;
+
+  color: #b8b8b8;
+
   font-size: 1.1rem;
   line-height: 1.8;
-  margin-bottom: 2.5rem;
-  color: #dddddd; /* Light gray for readability */
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
 }
+
+.about-summary li + li {
+  margin-top: 0.4rem;
+}
+
+/* --------------------------------
+   Sections
+-------------------------------- */
 
 .about-section {
-  margin-bottom: 2.5rem;
+  margin-top: 4.5rem;
 }
 
-.about-section h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: #f5f5f5;
-  border-bottom: 2px solid #444;
-  padding-bottom: 0.5rem;
-}
+.about-section__title {
+  margin: 0 0 1.5rem;
 
-.education-grid,
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.education-card,
-.skill-card {
-  background-color: #1e1e1e;
-  padding: 1.2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.05);
-  transition: transform 0.2s ease;
-  border: 1px solid #333;
-}
-
-.education-card:hover,
-.skill-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-}
-
-.education-card p {
-  margin: 0.4rem 0;
-  color: #cccccc;
-  font-size: 0.95rem;
-}
-
-.education-card p span {
-  font-weight: 600;
   color: #ffffff;
+
+  font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
 }
 
-.skill-card {
-  text-align: center;
-  font-size: 1rem;
-  color: #eeeeee;
-  background-color: #2c2c2c;
+/* --------------------------------
+   Education
+-------------------------------- */
+
+.about-education {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.education-card {
+  display: flex;
+  flex-direction: column;
+
+  padding: 26px;
+
+  background: #18251f;
+  border: 1px solid #263b34;
+  border-radius: 18px;
+
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+.education-card__years {
+  margin-bottom: 8px;
+
+  color: #9b9b9b;
+
+  font-size: 13px;
   font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.education-card__degree {
+  margin: 0;
+
+  color: #9ae6b4;
+
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.education-card__details {
+  margin: 8px 0 0;
+
+  color: #e6e6e6;
+
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.education-card__courses {
+  margin-top: 20px;
+  padding-top: 18px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.education-card__courses-title {
+  margin: 0 0 10px;
+
+  color: #8f8f8f;
+
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.education-card__course-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.education-card__course {
+  padding: 6px 10px;
+
+  background: #202020;
+  border: 1px solid #303030;
+  border-radius: 999px;
+
+  color: #b8b8b8;
+
+  font-size: 12.5px;
+  line-height: 1.2;
+}
+
+/* --------------------------------
+   Skills
+-------------------------------- */
+
+.about-skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.skill-group {
+  padding: 22px 24px;
+
+  background: #171717;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.skill-group__title {
+  margin: 0 0 14px;
+
+  color: #e6e6e6;
+
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.skill-group__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+/* --------------------------------
+   Empty / Error State
+-------------------------------- */
+
+.about-state {
+  max-width: 620px;
+  margin: 2rem auto 0;
+  padding: 3rem 2rem;
+
+  text-align: center;
+
+  background: #171717;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.about-state h2 {
+  margin: 0 0 0.75rem;
+
+  color: #ffffff;
+
+  font-size: 1.3rem;
+}
+
+.about-state p {
+  margin: 0;
+
+  color: #8f8f8f;
+
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* --------------------------------
+   Tablet
+-------------------------------- */
+
+@media (max-width: 850px) {
+  .about-page {
+    padding: 4rem 1.5rem 5rem;
+  }
+}
+
+/* --------------------------------
+   Mobile
+-------------------------------- */
+
+@media (max-width: 600px) {
+  .about-page {
+    padding: 3rem 1rem 4rem;
+  }
+
+  .about-page__header {
+    margin-bottom: 2.5rem;
+  }
+
+  .about-page__title {
+    font-size: 2.5rem;
+  }
+
+  .about-page__subtitle {
+    font-size: 0.9rem;
+  }
+
+  .about-summary {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .about-section {
+    margin-top: 3.5rem;
+  }
+
+  .about-education,
+  .about-skills {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .education-card {
+    padding: 22px;
+    border-radius: 14px;
+  }
+
+  .skill-group {
+    padding: 18px;
+    border-radius: 12px;
+  }
 }

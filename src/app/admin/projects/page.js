@@ -1,7 +1,16 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import RichText from '../../../components/RichText'
+import RichTextEditor from '../../../components/admin/RichTextEditor'
+import ReorderButtons from '../../../components/admin/ReorderButtons'
+import useOrderSaver, {
+  OrderStatus,
+  moveItem,
+} from '../../../components/admin/useOrderSaver'
+import { sortByDisplayOrder } from '../../../utils/fetchJson'
+import '../../../components/admin/AdminUI.css'
 
 export default function AdminProjectsPage() {
   const router = useRouter()
@@ -24,6 +33,7 @@ export default function AdminProjectsPage() {
   })
 
   const [showNewForm, setShowNewForm] = useState(false)
+  const { saving, status, saveOrder } = useOrderSaver()
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -41,9 +51,9 @@ export default function AdminProjectsPage() {
         if (!res.ok) throw new Error('Unauthorized or error fetching projects')
         return res.json()
       })
-      .then((data) => setProjects(data))
+      .then((data) => setProjects(sortByDisplayOrder(data)))
       .catch((err) => {
-        console.error('❌ Project fetch error:', err)
+        console.error('Project fetch error:', err)
         setError('You are not authorized or something went wrong.')
       })
   }, [router])
@@ -84,7 +94,7 @@ export default function AdminProjectsPage() {
       )
       setEditProjectId(null)
     } catch (err) {
-      console.error('❌ Update failed:', err)
+      console.error('Update failed:', err)
       alert('Failed to update project.')
     }
   }
@@ -96,6 +106,10 @@ export default function AdminProjectsPage() {
 
   const handleNewSubmit = async (e) => {
     e.preventDefault()
+    if (!newProject.description) {
+      alert('Please add a project description.')
+      return
+    }
     try {
       const token = localStorage.getItem('token')
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -115,14 +129,25 @@ export default function AdminProjectsPage() {
       setShowNewForm(false)
       setNewProject({ title: '', stack: '', description: '', github: '' })
     } catch (err) {
-      console.error('❌ Failed to add project:', err)
+      console.error('Failed to add project:', err)
       alert('Something went wrong.')
     }
   }
 
-  const autoResize = (el) => {
-    el.style.height = 'auto'
-    el.style.height = el.scrollHeight + 'px'
+  const handleMove = (from, to) => {
+    const previous = projects
+    const next = moveItem(projects, from, to)
+    if (next === previous) return
+
+    saveOrder({
+      path: '/api/admin/projects/order',
+      body: { orderedIds: next.map((project) => project.id) },
+      apply: () => setProjects(next),
+      revert: () => setProjects(previous),
+      successMessage: 'Project order saved.',
+    }).then((saved) => {
+      if (Array.isArray(saved)) setProjects(sortByDisplayOrder(saved))
+    })
   }
 
   const handleDelete = async (id) => {
@@ -142,7 +167,7 @@ export default function AdminProjectsPage() {
       if (!res.ok) throw new Error('Failed to delete')
       setProjects((prev) => prev.filter((proj) => proj.id !== id))
     } catch (err) {
-      console.error('❌ Delete failed:', err)
+      console.error('Delete failed:', err)
       alert('Failed to delete project.')
     }
   }
@@ -150,7 +175,7 @@ export default function AdminProjectsPage() {
   return (
     <main style={{ padding: '2rem' }}>
       <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>
-        🛠️ Manage Projects
+        Manage Projects
       </h1>
 
       {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
@@ -168,7 +193,7 @@ export default function AdminProjectsPage() {
           cursor: 'pointer',
         }}
       >
-        {showNewForm ? 'Hide Form' : '➕ Add New Project'}
+        {showNewForm ? 'Hide Form' : 'Add New Project'}
       </button>
 
       {showNewForm && (
@@ -191,23 +216,17 @@ export default function AdminProjectsPage() {
             required
             style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
           />
-          <textarea
-            name="description"
+          <label className="admin-field-label" htmlFor="new-project-description">
+            Description
+          </label>
+          <RichTextEditor
+            id="new-project-description"
+            label="Project description"
+            legacy="list"
             value={newProject.description}
-            onChange={(e) => {
-              handleNewChange(e)
-              autoResize(e.target)
-            }}
-            placeholder="Description (with line breaks if needed)"
-            rows="3"
-            required
-            style={{
-              display: 'block',
-              width: '100%',
-              marginBottom: '0.5rem',
-              overflow: 'hidden',
-              resize: 'none',
-            }}
+            onChange={(html) =>
+              setNewProject((prev) => ({ ...prev, description: html }))
+            }
           />
           <input
             type="text"
@@ -218,13 +237,15 @@ export default function AdminProjectsPage() {
             required
             style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
           />
-          <button type="submit">➕ Add Project</button>
+          <button type="submit">Add Project</button>
         </form>
       )}
 
+      <OrderStatus status={status} saving={saving} />
+
       {projects.length > 0 ? (
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          {projects.map((project) => (
+          {projects.map((project, index) => (
             <li
               key={project.id}
               style={{
@@ -236,6 +257,16 @@ export default function AdminProjectsPage() {
                 color: '#222',
               }}
             >
+              <div className="admin-item-head">
+                <ReorderButtons
+                  index={index}
+                  count={projects.length}
+                  label={project.title}
+                  onMove={handleMove}
+                  disabled={saving}
+                />
+              </div>
+
               {editProjectId === project.id ? (
                 <>
                   <input
@@ -254,21 +285,15 @@ export default function AdminProjectsPage() {
                     placeholder="Tech Stack"
                     style={{ marginBottom: '0.5rem', width: '100%' }}
                   />
-                  <textarea
-                    name="description"
+                  <RichTextEditor
+                    key={`edit-project-${project.id}`}
+                    id={`project-${project.id}-description`}
+                    label="Project description"
+                    legacy="list"
                     value={editData.description}
-                    onChange={(e) => {
-                      handleEditChange(e)
-                      autoResize(e.target)
-                    }}
-                    placeholder="Edit project description"
-                    rows="3"
-                    style={{
-                      marginBottom: '0.5rem',
-                      width: '100%',
-                      overflow: 'hidden',
-                      resize: 'none',
-                    }}
+                    onChange={(html) =>
+                      setEditData((prev) => ({ ...prev, description: html }))
+                    }
                   />
                   <input
                     type="text"
@@ -283,10 +308,10 @@ export default function AdminProjectsPage() {
                       onClick={() => handleEditSubmit(project.id)}
                       style={{ marginRight: '1rem' }}
                     >
-                      ✅ Save
+                      Save
                     </button>
                     <button onClick={() => setEditProjectId(null)}>
-                      ❌ Cancel
+                      Cancel
                     </button>
                   </div>
                 </>
@@ -298,24 +323,28 @@ export default function AdminProjectsPage() {
                   <p style={{ margin: '0.5rem 0', color: '#444' }}>
                     {project.stack}
                   </p>
-                  <p style={{ color: '#555', whiteSpace: 'pre-line' }}>
-                    {project.description}
-                  </p>
-                  <a href={project.github} target="_blank" rel="noreferrer">
-                    View →
+                  <div className="admin-rich-preview rich-text">
+                    <RichText value={project.description} legacy="list" />
+                  </div>
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View on GitHub
                   </a>
                   <div style={{ marginTop: '1rem' }}>
                     <button
                       style={{ marginRight: '1rem' }}
                       onClick={() => handleEditClick(project)}
                     >
-                      ✏️ Edit
+                      Edit
                     </button>
                     <button
                       style={{ color: 'red' }}
                       onClick={() => handleDelete(project.id)}
                     >
-                      🗑️ Delete
+                      Delete
                     </button>
                   </div>
                 </>
