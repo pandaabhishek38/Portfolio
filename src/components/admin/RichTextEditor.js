@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import {
@@ -50,6 +50,19 @@ const extensions = [
   }),
 ]
 
+// Toolbar state until the editor reports its first transaction.
+const DEFAULT_TOOLBAR_STATE = {
+  bold: false,
+  italic: false,
+  underline: false,
+  bulletList: false,
+  orderedList: false,
+  link: false,
+  blockType: 'p',
+  canUndo: false,
+  canRedo: false,
+}
+
 function ToolbarButton({ label, icon: Icon, onClick, active, disabled }) {
   return (
     <button
@@ -77,11 +90,11 @@ export default function RichTextEditor({
   const [linkValue, setLinkValue] = useState('')
   const [linkError, setLinkError] = useState('')
 
-  const editor = useEditor({
-    extensions,
-    content: toEditorHtml(value, { legacy }),
-    immediatelyRender: false,
-    editorProps: {
+  // Stable across renders so Tiptap does not re-apply options every render.
+  // `value` is only read on mount (see note above).
+  const [initialContent] = useState(() => toEditorHtml(value, { legacy }))
+  const editorProps = useMemo(
+    () => ({
       attributes: {
         class: 'rte__content',
         id,
@@ -89,13 +102,23 @@ export default function RichTextEditor({
         'aria-multiline': 'true',
         'aria-label': label,
       },
-    },
+    }),
+    [id, label]
+  )
+
+  const editor = useEditor({
+    extensions,
+    content: initialContent,
+    immediatelyRender: false,
+    editorProps,
     onUpdate: ({ editor: current }) => {
       onChange(current.isEmpty ? '' : current.getHTML())
     },
   })
 
-  const state = useEditorState({
+  // The snapshot stays null until the editor's first transaction, so fall
+  // back to a neutral state instead of blocking <EditorContent> on it.
+  const toolbarState = useEditorState({
     editor,
     selector: ({ editor: current }) => {
       if (!current) return null
@@ -117,8 +140,9 @@ export default function RichTextEditor({
       }
     },
   })
+  const state = toolbarState ?? DEFAULT_TOOLBAR_STATE
 
-  if (!editor || !state) {
+  if (!editor) {
     return <div className="rte rte--loading" aria-hidden="true" />
   }
 
