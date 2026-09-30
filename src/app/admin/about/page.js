@@ -98,7 +98,8 @@ export default function AdminAboutPage() {
 
   const handleSummarySave = async () => {
     const token = localStorage.getItem('token')
-    if (!summaryId) {
+    // 0 is a valid id; only a missing summary row has no id
+    if (summaryId === null || summaryId === undefined) {
       alert('Summary ID is not available. Cannot update.')
       return
     }
