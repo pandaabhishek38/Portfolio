@@ -23,13 +23,14 @@ model Project {
 }
 
 model Experience {
-  id           Int    @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   company      String
   role         String
   period       String
   location     String
   description  String // Sanitized rich-text HTML, or legacy newline-separated plain text
-  displayOrder Int    @default(0)
+  displayOrder Int     @default(0)
+  logoUrl      String? // Optional company/organization logo (https URL or site path)
 }
 
 model ContactItem {

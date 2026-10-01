@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import ProjectCard from '../../components/ProjectCard'
 import { sortByDisplayOrder } from '../../utils/fetchJson'
+import PageHeader from '../../components/PageHeader'
 import './ProjectsPage.css'
 
 export default function ProjectsPage() {
@@ -39,15 +40,10 @@ export default function ProjectsPage() {
 
   return (
     <main className="projects-page">
-      <header className="projects-page__header">
-        <span className="projects-page__eyebrow">SELECTED WORK</span>
-
-        <h1 className="projects-page__title">Projects</h1>
-
-        <p className="projects-page__subtitle">
-          A collection of software, data, and machine learning projects.
-        </p>
-      </header>
+      <PageHeader
+        title="Projects"
+        subtitle="A collection of software, data, and machine learning projects."
+      />
 
       {loading && (
         <div

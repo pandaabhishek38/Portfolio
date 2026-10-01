@@ -1,12 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import ExperienceLogo from './ExperienceLogo'
 import RichText from './RichText'
-import {
-  countUnits,
-  parseRichText,
-  truncateBlocks,
-} from '../utils/richText'
+import { countUnits, parseRichText, truncateBlocks } from '../utils/richText'
 import { isCurrentPeriod } from '../utils/period'
 import './ExperienceCard.css'
 
@@ -18,6 +15,7 @@ export default function ExperienceCard({
   location,
   period,
   description,
+  logoUrl,
 }) {
   const [expanded, setExpanded] = useState(false)
 
@@ -37,62 +35,66 @@ export default function ExperienceCard({
       className={`experience-card${expanded ? ' experience-card--expanded' : ''}`}
     >
       <div className="experience-card__content">
-        {/* Header */}
+        {/* Header: logo (or monogram) beside period, role and company */}
         <div className="experience-card__header">
-          {(period || isCurrent) && (
-            <div className="experience-card__meta">
-              {period && (
-                <span className="experience-card__eyebrow">{period}</span>
-              )}
+          <ExperienceLogo logoUrl={logoUrl} company={company} />
 
-              {isCurrent && (
-                <span className="ui-pill">Current</span>
-              )}
+          <div className="experience-card__heading">
+            {(period || isCurrent) && (
+              <div className="experience-card__meta">
+                {period && (
+                  <span className="experience-card__eyebrow">{period}</span>
+                )}
+
+                {isCurrent && <span className="ui-pill">Current</span>}
+              </div>
+            )}
+
+            <h2 className="experience-card__title">{role}</h2>
+
+            {(company || location) && (
+              <p className="experience-card__org">
+                {company && (
+                  <span className="experience-card__company">{company}</span>
+                )}
+
+                {location && (
+                  <span className="experience-card__location">
+                    {company ? ' · ' : ''}
+                    {location}
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="experience-card__body">
+          {/* Description */}
+          <div className="experience-card__description rich-text">
+            {visibleDescription.length > 0 ? (
+              <RichText blocks={visibleDescription} />
+            ) : (
+              <p className="experience-card__no-description">
+                No description available.
+              </p>
+            )}
+          </div>
+
+          {/* View More / View Less */}
+          {hasMoreDescription && (
+            <div className="experience-card__toggle-row">
+              <button
+                type="button"
+                className="experience-card__toggle"
+                onClick={() => setExpanded((prev) => !prev)}
+                aria-expanded={expanded}
+              >
+                {expanded ? 'View Less' : 'View More'}
+              </button>
             </div>
           )}
-
-          <h2 className="experience-card__title">{role}</h2>
-
-          {(company || location) && (
-            <p className="experience-card__org">
-              {company && (
-                <span className="experience-card__company">{company}</span>
-              )}
-
-              {location && (
-                <span className="experience-card__location">
-                  {company ? ' · ' : ''}
-                  {location}
-                </span>
-              )}
-            </p>
-          )}
         </div>
-
-        {/* Description */}
-        <div className="experience-card__description rich-text">
-          {visibleDescription.length > 0 ? (
-            <RichText blocks={visibleDescription} />
-          ) : (
-            <p className="experience-card__no-description">
-              No description available.
-            </p>
-          )}
-        </div>
-
-        {/* View More / View Less */}
-        {hasMoreDescription && (
-          <div className="experience-card__toggle-row">
-            <button
-              type="button"
-              className="experience-card__toggle"
-              onClick={() => setExpanded((prev) => !prev)}
-              aria-expanded={expanded}
-            >
-              {expanded ? 'View Less' : 'View More'}
-            </button>
-          </div>
-        )}
       </div>
     </article>
   )

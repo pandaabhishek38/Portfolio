@@ -19,50 +19,6 @@ body:has(.about-page) {
 }
 
 /* --------------------------------
-   Page Header
--------------------------------- */
-
-.about-page__header {
-  max-width: 760px;
-  margin: 0 auto 3.5rem;
-
-  text-align: center;
-}
-
-.about-page__eyebrow {
-  display: inline-block;
-  margin-bottom: 0.75rem;
-
-  color: #0070f3;
-
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.about-page__title {
-  margin: 0;
-
-  color: #ffffff;
-
-  font-size: clamp(2.5rem, 5vw, 3.75rem);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
-}
-
-.about-page__subtitle {
-  max-width: 620px;
-  margin: 1rem auto 0;
-
-  color: #8f8f8f;
-
-  font-size: 1rem;
-  line-height: 1.7;
-}
-
-/* --------------------------------
    Summary
 -------------------------------- */
 
@@ -70,7 +26,7 @@ body:has(.about-page) {
   --rich-text-gap: 1.1rem;
 
   max-width: 720px;
-  margin: 0 auto;
+  margin: 0; /* aligned with the left-aligned page header */
 
   color: #b8b8b8;
 
@@ -287,18 +243,6 @@ body:has(.about-page) {
 @media (max-width: 600px) {
   .about-page {
     padding: 3rem 1rem 4rem;
-  }
-
-  .about-page__header {
-    margin-bottom: 2.5rem;
-  }
-
-  .about-page__title {
-    font-size: 2.5rem;
-  }
-
-  .about-page__subtitle {
-    font-size: 0.9rem;
   }
 
   .about-summary {

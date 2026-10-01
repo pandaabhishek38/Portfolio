@@ -107,3 +107,53 @@
 .admin-rich-preview .rich-text__link {
   color: #0059c1;
 }
+
+/* Experience logo field (admin) */
+.admin-logo-field {
+  margin: 0.25rem 0 0.75rem;
+}
+
+.admin-logo-field__optional {
+  color: #777;
+
+  font-weight: 400;
+}
+
+.admin-logo-field__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-logo-field__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-logo-field__input[aria-invalid='true'] {
+  border-color: #c62828;
+}
+
+.admin-logo-field__hint {
+  margin: 0.35rem 0 0;
+
+  color: #666;
+
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.admin-logo-field__error {
+  margin: 0.35rem 0 0;
+
+  color: #c62828;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-logo-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

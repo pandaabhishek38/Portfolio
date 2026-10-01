@@ -10,6 +10,7 @@ import {
   FiPhone,
 } from 'react-icons/fi'
 import ContactForm from '../../components/ContactForm'
+import PageHeader from '../../components/PageHeader'
 import './contact.css'
 
 const CHANNEL_ICONS = {
@@ -146,16 +147,10 @@ export default function ContactPage() {
 
   return (
     <main className="contact-page">
-      <header className="contact-page__header">
-        <span className="contact-page__eyebrow">CONTACT</span>
-
-        <h1 className="contact-page__title">Let&apos;s talk</h1>
-
-        <p className="contact-page__subtitle">
-          Open to new roles, collaborations, and questions. Reach out directly
-          or send a message.
-        </p>
-      </header>
+      <PageHeader
+        title="Let’s talk"
+        subtitle="Open to new roles, collaborations, and questions. Reach out directly or send a message."
+      />
 
       <div className="contact-layout">
         <section

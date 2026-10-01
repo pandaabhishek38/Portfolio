@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import ExperienceCard from '../../components/ExperienceCard'
 import { sortByDisplayOrder } from '../../utils/fetchJson'
+import PageHeader from '../../components/PageHeader'
 import './experience.css'
 
 export default function ExperiencePage() {
@@ -39,15 +40,10 @@ export default function ExperiencePage() {
 
   return (
     <main className="experience-page">
-      <header className="experience-page__header">
-        <span className="experience-page__eyebrow">CAREER</span>
-
-        <h1 className="experience-page__title">Experience</h1>
-
-        <p className="experience-page__subtitle">
-          Roles, teams, and the work I&apos;ve done along the way.
-        </p>
-      </header>
+      <PageHeader
+        title="Experience"
+        subtitle="Roles, teams, and the work I’ve done along the way."
+      />
 
       {loading && (
         <ol
@@ -109,6 +105,7 @@ export default function ExperiencePage() {
                 location={exp.location}
                 period={exp.period}
                 description={exp.description}
+                logoUrl={exp.logoUrl}
               />
             </li>
           ))}

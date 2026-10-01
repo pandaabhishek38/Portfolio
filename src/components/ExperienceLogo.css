@@ -1,0 +1,72 @@
+/* =========================================================
+   EXPERIENCE LOGO
+   Rounded-square tile (matches the card radius language).
+   Fixed size so a loading/broken image never shifts layout.
+   ========================================================= */
+
+.experience-logo {
+  --experience-logo-size: 52px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: var(--experience-logo-size);
+  height: var(--experience-logo-size);
+  box-sizing: border-box;
+
+  border: 1px solid #263b34;
+  border-radius: 12px;
+
+  overflow: hidden;
+}
+
+.experience-logo--sm {
+  --experience-logo-size: 40px;
+
+  border-radius: 10px;
+}
+
+/* Real logo: light neutral tile so dark, colorful and transparent
+   logos all stay legible on the dark card. */
+.experience-logo--image {
+  padding: 6px;
+
+  background: #f4f6f5;
+  border-color: rgba(255, 255, 255, 0.14);
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.experience-logo__image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Fallback monogram */
+.experience-logo--monogram {
+  background: linear-gradient(145deg, #1f3a30, #15211c);
+}
+
+.experience-logo__monogram {
+  color: #9ae6b4;
+
+  font-size: calc(var(--experience-logo-size) * 0.32);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 600px) {
+  .experience-logo--md {
+    --experience-logo-size: 44px;
+
+    border-radius: 10px;
+  }
+}

@@ -5,6 +5,7 @@ import RichText from '../../components/RichText'
 import TechBadge from '../../components/TechBadge'
 import { fetchJson, sortSkills } from '../../utils/fetchJson'
 import { parseRichText } from '../../utils/richText'
+import PageHeader from '../../components/PageHeader'
 import './AboutPage.css'
 
 // Always render with fresh admin-edited data (as before, via no-store).
@@ -100,15 +101,10 @@ export default async function AboutPage() {
 
   return (
     <main className="about-page">
-      <header className="about-page__header">
-        <span className="about-page__eyebrow">ABOUT</span>
-
-        <h1 className="about-page__title">About Me</h1>
-
-        <p className="about-page__subtitle">
-          Background, education, and the technologies I work with.
-        </p>
-      </header>
+      <PageHeader
+        title="About Me"
+        subtitle="Background, education, and the technologies I work with."
+      />
 
       {!hasContent && (
         <section className="about-state">

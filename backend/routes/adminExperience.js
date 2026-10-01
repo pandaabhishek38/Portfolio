@@ -2,6 +2,7 @@ import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import verifyToken from '../middleware/verifyToken.js'
 import { sanitizeRichText } from '../utils/richText.js'
+import { parseOptionalImageUrl } from '../utils/imageUrl.js'
 import {
   DISPLAY_ORDER,
   applyDisplayOrder,
@@ -18,6 +19,9 @@ router.use(verifyToken)
 // CREATE Experience (appended at the end of the current order)
 router.post('/', async (req, res) => {
   const { company, role, period, location, description } = req.body
+  const logo = parseOptionalImageUrl(req.body.logoUrl)
+  if (logo.error) return res.status(400).json({ error: logo.error })
+
   try {
     const displayOrder = await nextDisplayOrder(prisma.experience)
     const created = await prisma.experience.create({
@@ -27,6 +31,7 @@ router.post('/', async (req, res) => {
         period,
         location,
         description: sanitizeRichText(description),
+        logoUrl: logo.value ?? null,
         displayOrder,
       },
     })
@@ -70,6 +75,9 @@ router.put('/order', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { company, role, period, location, description } = req.body
   const { id } = req.params
+  const logo = parseOptionalImageUrl(req.body.logoUrl)
+  if (logo.error) return res.status(400).json({ error: logo.error })
+
   try {
     const updated = await prisma.experience.update({
       where: { id: parseInt(id) },
@@ -80,6 +88,7 @@ router.put('/:id', async (req, res) => {
         location,
         description:
           description === undefined ? undefined : sanitizeRichText(description),
+        logoUrl: logo.value,
       },
     })
     res.json(updated)

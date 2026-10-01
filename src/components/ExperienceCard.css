@@ -49,7 +49,23 @@
    ========================================================= */
 
 .experience-card__header {
+  --experience-card-logo-gap: 18px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--experience-card-logo-gap);
+
   margin-bottom: 20px;
+}
+
+.experience-card__heading {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Description + View More align with the text column beside the logo */
+.experience-card__body {
+  padding-left: calc(52px + 18px);
 }
 
 .experience-card__meta {
@@ -205,6 +221,14 @@
 }
 
 @media (max-width: 600px) {
+  .experience-card__header {
+    gap: 14px;
+  }
+
+  .experience-card__body {
+    padding-left: 0;
+  }
+
   .experience-card {
     border-radius: 14px;
   }

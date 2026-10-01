@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import ExperienceLogo, { safeLogoSrc } from '../../../components/ExperienceLogo'
 import RichText from '../../../components/RichText'
 import RichTextEditor from '../../../components/admin/RichTextEditor'
 import ReorderButtons from '../../../components/admin/ReorderButtons'
@@ -11,6 +12,61 @@ import useOrderSaver, {
 } from '../../../components/admin/useOrderSaver'
 import { sortByDisplayOrder } from '../../../utils/fetchJson'
 import '../../../components/admin/AdminUI.css'
+
+const LOGO_URL_ERROR =
+  'Logo URL must start with https:// (or be a site path like /logos/company.png).'
+
+function logoUrlInvalid(value) {
+  const url = String(value || '').trim()
+  return Boolean(url) && !safeLogoSrc(url)
+}
+
+/* Optional company logo: URL input with a live preview tile. */
+function LogoUrlField({ id, value, company, onChange }) {
+  const invalid = logoUrlInvalid(value)
+
+  return (
+    <div className="admin-logo-field">
+      <label className="admin-field-label" htmlFor={id}>
+        Company logo URL{' '}
+        <span className="admin-logo-field__optional">(optional)</span>
+      </label>
+
+      <div className="admin-logo-field__row">
+        <ExperienceLogo
+          logoUrl={invalid ? '' : value}
+          company={company}
+          size="sm"
+        />
+        <input
+          id={id}
+          type="text"
+          inputMode="url"
+          name="logoUrl"
+          value={value}
+          onChange={onChange}
+          placeholder="https://example.com/logo.png or /logos/company.png"
+          aria-invalid={invalid}
+          aria-describedby={`${id}-hint`}
+          className="admin-logo-field__input"
+        />
+      </div>
+
+      <p id={`${id}-hint`} className="admin-logo-field__hint">
+        Shown beside the role on the Experience page (left tile is a live
+        preview). Use a square PNG, SVG or WebP, at least 128 x 128 px, on a
+        transparent or white background. Leave empty to show the company
+        initials instead.
+      </p>
+
+      {invalid && (
+        <p className="admin-logo-field__error" role="alert">
+          {LOGO_URL_ERROR}
+        </p>
+      )}
+    </div>
+  )
+}
 
 export default function AdminExperiencePage() {
   const router = useRouter()
@@ -24,6 +80,7 @@ export default function AdminExperiencePage() {
     period: '',
     location: '',
     description: '',
+    logoUrl: '',
   })
 
   const [showNewForm, setShowNewForm] = useState(false)
@@ -33,6 +90,7 @@ export default function AdminExperiencePage() {
     period: '',
     location: '',
     description: '',
+    logoUrl: '',
   })
 
   const { saving, status, saveOrder } = useOrderSaver()
@@ -68,6 +126,7 @@ export default function AdminExperiencePage() {
       period: exp.period,
       location: exp.location,
       description: exp.description,
+      logoUrl: exp.logoUrl || '',
     })
   }
 
@@ -77,6 +136,10 @@ export default function AdminExperiencePage() {
   }
 
   const handleEditSubmit = async (id) => {
+    if (logoUrlInvalid(editData.logoUrl)) {
+      alert(LOGO_URL_ERROR)
+      return
+    }
     try {
       const token = localStorage.getItem('token')
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -151,6 +214,10 @@ export default function AdminExperiencePage() {
       alert('Please add an experience description.')
       return
     }
+    if (logoUrlInvalid(newExperience.logoUrl)) {
+      alert(LOGO_URL_ERROR)
+      return
+    }
     try {
       const token = localStorage.getItem('token')
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -173,6 +240,7 @@ export default function AdminExperiencePage() {
         period: '',
         location: '',
         description: '',
+        logoUrl: '',
       })
     } catch (err) {
       console.error('Failed to add experience:', err)
@@ -239,6 +307,12 @@ export default function AdminExperiencePage() {
             placeholder="Location"
             required
             style={{ display: 'block', marginBottom: '0.5rem', width: '100%' }}
+          />
+          <LogoUrlField
+            id="new-experience-logo"
+            value={newExperience.logoUrl}
+            company={newExperience.company}
+            onChange={handleNewChange}
           />
           <label
             className="admin-field-label"
@@ -349,6 +423,12 @@ export default function AdminExperiencePage() {
                       marginBottom: '0.5rem',
                     }}
                   />
+                  <LogoUrlField
+                    id={`experience-${exp.id}-logo`}
+                    value={editData.logoUrl}
+                    company={editData.company}
+                    onChange={handleEditChange}
+                  />
                   <RichTextEditor
                     key={`edit-experience-${exp.id}`}
                     id={`experience-${exp.id}-description`}
@@ -374,9 +454,16 @@ export default function AdminExperiencePage() {
                 </>
               ) : (
                 <>
-                  <strong style={{ fontSize: '1.2rem', color: '#111' }}>
-                    {exp.company}
-                  </strong>
+                  <div className="admin-logo-heading">
+                    <ExperienceLogo
+                      logoUrl={exp.logoUrl}
+                      company={exp.company}
+                      size="sm"
+                    />
+                    <strong style={{ fontSize: '1.2rem', color: '#111' }}>
+                      {exp.company}
+                    </strong>
+                  </div>
                   <p style={{ color: '#444' }}>
                     <strong>{exp.role}</strong> | {exp.period} | {exp.location}
                   </p>
