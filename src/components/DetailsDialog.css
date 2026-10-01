@@ -1,0 +1,232 @@
+/* =========================================================
+   DETAILS DIALOG (shared shell)
+   Structure, backdrop, scrolling, close controls, responsive
+   sizing and motion for the Projects / Experience detail modals.
+   Each variant adds its own surface and typography.
+   ========================================================= */
+
+.details-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 2000; /* above navbar and the chat button */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 32px;
+  box-sizing: border-box;
+
+  background: rgba(6, 9, 8, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  animation: details-dialog-fade-in 180ms ease-out both;
+}
+
+.details-dialog__panel {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 86vw;
+  max-width: 980px;
+  max-height: min(88vh, 900px);
+  max-height: min(88dvh, 900px);
+  box-sizing: border-box;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  animation: details-dialog-rise 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ---------- Header ---------- */
+
+.details-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 34px 40px 22px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.details-dialog__heading {
+  min-width: 0;
+}
+
+.details-dialog__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 40px;
+  height: 40px;
+  padding: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.04);
+  color: #d0d0d0;
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.details-dialog__close:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+}
+
+.details-dialog__close:focus-visible {
+  outline: 2px solid #80baff;
+  outline-offset: 2px;
+}
+
+/* ---------- Body (the only scrolling area) ---------- */
+
+.details-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+
+  padding: 26px 40px 30px;
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.details-dialog__body:focus-visible {
+  outline: 2px solid #80baff;
+  outline-offset: -2px;
+}
+
+/* ---------- Footer ---------- */
+
+.details-dialog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+
+  padding: 18px 40px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(0, 0, 0, 0.14);
+}
+
+/* ---------- Exit ---------- */
+
+.details-dialog--closing {
+  animation: details-dialog-fade-out 160ms ease-in both;
+}
+
+.details-dialog--closing .details-dialog__panel {
+  animation: details-dialog-sink 160ms ease-in both;
+}
+
+@keyframes details-dialog-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes details-dialog-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes details-dialog-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes details-dialog-sink {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(8px) scale(0.985); }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .details-dialog {
+    padding: 24px;
+  }
+
+  .details-dialog__panel {
+    width: 92vw;
+  }
+
+  .details-dialog__header {
+    padding: 28px 28px 18px;
+  }
+
+  .details-dialog__body {
+    padding: 22px 28px 26px;
+  }
+
+  .details-dialog__footer {
+    padding: 16px 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .details-dialog {
+    padding: 10px;
+  }
+
+  .details-dialog__panel {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+
+    border-radius: 16px;
+  }
+
+  .details-dialog__header {
+    gap: 12px;
+
+    padding: 22px 18px 16px;
+  }
+
+  .details-dialog__body {
+    padding: 18px 18px 22px;
+  }
+
+  .details-dialog__footer {
+    flex-wrap: wrap;
+
+    padding: 14px 18px;
+  }
+
+  .details-dialog__footer .ui-button {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .details-dialog,
+  .details-dialog__panel,
+  .details-dialog--closing,
+  .details-dialog--closing .details-dialog__panel {
+    animation: none;
+  }
+
+  .details-dialog__close {
+    transition: none;
+  }
+}

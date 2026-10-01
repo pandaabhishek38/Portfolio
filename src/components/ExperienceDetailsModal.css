@@ -1,0 +1,180 @@
+/* =========================================================
+   EXPERIENCE DETAILS MODAL (visuals)
+   Structure, scrolling and motion come from DetailsDialog.css.
+   Timeline-inspired: a vertical green-to-blue accent edge (like the
+   Experience rail), a deeper blue-tinted slate surface and a narrower,
+   text-focused reading width. Distinct from both the green cards and
+   the Projects modal (which uses a top accent edge).
+   ========================================================= */
+
+.experience-modal__panel {
+  max-width: 860px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background:
+    radial-gradient(
+      90% 60% at 100% 100%,
+      rgba(0, 112, 243, 0.09),
+      transparent 60%
+    ),
+    radial-gradient(
+      80% 50% at 0% 0%,
+      rgba(154, 230, 180, 0.06),
+      transparent 55%
+    ),
+    linear-gradient(165deg, #19231f 0%, #141a18 55%, #121720 100%);
+
+  color: #e6e6e6;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(154, 230, 180, 0.06),
+    0 0 48px rgba(154, 230, 180, 0.05);
+}
+
+/* Vertical accent edge echoing the Experience timeline rail */
+.experience-modal__panel::before {
+  content: '';
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+
+  width: 3px;
+
+  background: linear-gradient(
+    180deg,
+    #9ae6b4 0%,
+    rgba(0, 112, 243, 0.75) 60%,
+    rgba(0, 112, 243, 0) 100%
+  );
+}
+
+.experience-modal__header {
+  /* Logo tile size inside the modal (ExperienceLogo size="lg") */
+  --experience-card-logo-size: 72px;
+
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ---------- Identity: logo + period / role / company ---------- */
+
+.experience-modal__identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.experience-modal__heading-text {
+  min-width: 0;
+}
+
+.experience-modal__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 8px;
+}
+
+.experience-modal__period {
+  color: #a9a9a9;
+
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.experience-modal__title {
+  margin: 0;
+
+  color: #9ae6b4;
+
+  font-size: clamp(24px, 2.8vw, 34px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+
+.experience-modal__org {
+  margin: 8px 0 0;
+
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.experience-modal__company {
+  color: #ffffff;
+
+  font-weight: 600;
+}
+
+.experience-modal__location {
+  color: #8f8f8f;
+}
+
+/* ---------- Description ---------- */
+
+.experience-modal__description {
+  max-width: 72ch;
+
+  color: #c7c7c7;
+
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.experience-modal__description li {
+  margin-bottom: 12px;
+}
+
+.experience-modal__description li:last-child {
+  margin-bottom: 0;
+}
+
+.experience-modal__description li::marker {
+  color: #7ee8a8;
+}
+
+.experience-modal__empty {
+  margin: 0;
+
+  color: #8f8f8f;
+
+  font-style: italic;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 600px) {
+  .experience-modal__header {
+    --experience-card-logo-size: 52px;
+  }
+
+  .experience-modal__identity {
+    gap: 14px;
+  }
+
+  .experience-modal__period {
+    font-size: 12px;
+  }
+
+  .experience-modal__title {
+    font-size: 22px;
+  }
+
+  .experience-modal__org {
+    font-size: 14px;
+  }
+
+  .experience-modal__description {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+}

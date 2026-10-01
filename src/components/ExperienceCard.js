@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import ExperienceLogo from './ExperienceLogo'
 import RichText from './RichText'
 import { countUnits, parseRichText, truncateBlocks } from '../utils/richText'
@@ -18,24 +17,20 @@ export default function ExperienceCard({
   logoUrl,
   logoShape,
   logoZoom,
+  onViewMore,
 }) {
-  const [expanded, setExpanded] = useState(false)
-
   // Rich-text HTML, or legacy newline-separated text shown as bullets
   const descriptionBlocks = parseRichText(description, { legacy: 'list' })
   const descriptionUnits = countUnits(descriptionBlocks)
 
-  const visibleDescription = expanded
-    ? descriptionBlocks
-    : truncateBlocks(descriptionBlocks, INITIAL_BULLETS)
+  // Cards always show a short preview; the full entry opens in a modal.
+  const visibleDescription = truncateBlocks(descriptionBlocks, INITIAL_BULLETS)
 
   const hasMoreDescription = descriptionUnits > INITIAL_BULLETS
   const isCurrent = isCurrentPeriod(period)
 
   return (
-    <article
-      className={`experience-card${expanded ? ' experience-card--expanded' : ''}`}
-    >
+    <article className="experience-card">
       <div className="experience-card__content">
         {/* Header: logo (or monogram) beside period, role and company */}
         <div className="experience-card__header">
@@ -89,16 +84,17 @@ export default function ExperienceCard({
             )}
           </div>
 
-          {/* View More / View Less */}
-          {hasMoreDescription && (
+          {/* View More: opens the full entry in the details modal */}
+          {hasMoreDescription && onViewMore && (
             <div className="experience-card__toggle-row">
               <button
                 type="button"
                 className="experience-card__toggle"
-                onClick={() => setExpanded((prev) => !prev)}
-                aria-expanded={expanded}
+                onClick={onViewMore}
+                aria-haspopup="dialog"
+                aria-label={`View more about ${role}${company ? ` at ${company}` : ''}`}
               >
-                {expanded ? 'View Less' : 'View More'}
+                View More
               </button>
             </div>
           )}

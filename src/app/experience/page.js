@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import ExperienceCard from '../../components/ExperienceCard'
+import ExperienceDetailsModal from '../../components/ExperienceDetailsModal'
 import { sortByDisplayOrder } from '../../utils/fetchJson'
 import PageHeader from '../../components/PageHeader'
 import './experience.css'
@@ -10,6 +11,8 @@ export default function ExperiencePage() {
   const [experiences, setExperiences] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  // The one entry shown in the details modal (null = closed)
+  const [selectedExperience, setSelectedExperience] = useState(null)
 
   useEffect(() => {
     const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -108,11 +111,17 @@ export default function ExperiencePage() {
                 logoUrl={exp.logoUrl}
                 logoShape={exp.logoShape}
                 logoZoom={exp.logoZoom}
+                onViewMore={() => setSelectedExperience(exp)}
               />
             </li>
           ))}
         </ol>
       )}
+      <ExperienceDetailsModal
+        key={selectedExperience?.id ?? 'closed'}
+        experience={selectedExperience}
+        onClose={() => setSelectedExperience(null)}
+      />
     </main>
   )
 }
