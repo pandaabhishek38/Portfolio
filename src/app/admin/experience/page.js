@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ExperienceLogo, { safeLogoSrc } from '../../../components/ExperienceLogo'
 import RichText from '../../../components/RichText'
 import RichTextEditor from '../../../components/admin/RichTextEditor'
+import LogoUploadField from '../../../components/admin/LogoUploadField'
 import ReorderButtons from '../../../components/admin/ReorderButtons'
 import useOrderSaver, {
   OrderStatus,
@@ -19,53 +20,6 @@ const LOGO_URL_ERROR =
 function logoUrlInvalid(value) {
   const url = String(value || '').trim()
   return Boolean(url) && !safeLogoSrc(url)
-}
-
-/* Optional company logo: URL input with a live preview tile. */
-function LogoUrlField({ id, value, company, onChange }) {
-  const invalid = logoUrlInvalid(value)
-
-  return (
-    <div className="admin-logo-field">
-      <label className="admin-field-label" htmlFor={id}>
-        Company logo URL{' '}
-        <span className="admin-logo-field__optional">(optional)</span>
-      </label>
-
-      <div className="admin-logo-field__row">
-        <ExperienceLogo
-          logoUrl={invalid ? '' : value}
-          company={company}
-          size="sm"
-        />
-        <input
-          id={id}
-          type="text"
-          inputMode="url"
-          name="logoUrl"
-          value={value}
-          onChange={onChange}
-          placeholder="https://example.com/logo.png or /logos/company.png"
-          aria-invalid={invalid}
-          aria-describedby={`${id}-hint`}
-          className="admin-logo-field__input"
-        />
-      </div>
-
-      <p id={`${id}-hint`} className="admin-logo-field__hint">
-        Shown beside the role on the Experience page (left tile is a live
-        preview). Use a square PNG, SVG or WebP, at least 128 x 128 px, on a
-        transparent or white background. Leave empty to show the company
-        initials instead.
-      </p>
-
-      {invalid && (
-        <p className="admin-logo-field__error" role="alert">
-          {LOGO_URL_ERROR}
-        </p>
-      )}
-    </div>
-  )
 }
 
 export default function AdminExperiencePage() {
@@ -95,6 +49,48 @@ export default function AdminExperiencePage() {
 
   const { saving, status, saveOrder } = useOrderSaver()
 
+  // Logos uploaded in this session that no saved entry uses yet. They are
+  // deleted from storage when replaced, removed or the form is cancelled.
+  const pendingUploads = useRef(new Set())
+
+  const discardUpload = (url) => {
+    if (!pendingUploads.current.has(url)) return
+    pendingUploads.current.delete(url)
+
+    const token = localStorage.getItem('token')
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    fetch(`${baseURL}/api/admin/uploads/experience-logo`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ url }),
+    }).catch((err) => console.error('Could not discard unused logo:', err))
+  }
+
+  const discardAllPending = () => {
+    ;[...pendingUploads.current].forEach(discardUpload)
+  }
+
+  // After a successful save the saved logo is in use; anything else pending is not.
+  const settlePending = (savedLogoUrl) => {
+    pendingUploads.current.delete(savedLogoUrl)
+    discardAllPending()
+  }
+
+  const handleSessionExpired = () => {
+    localStorage.removeItem('token')
+    alert('Your admin session has expired. Please log in again.')
+    router.push('/admin/login')
+  }
+
+  const logoFieldHandlers = {
+    onUploaded: (url) => pendingUploads.current.add(url),
+    onDiscard: discardUpload,
+    onSessionExpired: handleSessionExpired,
+  }
+
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
@@ -119,6 +115,7 @@ export default function AdminExperiencePage() {
   }, [router])
 
   const handleEditClick = (exp) => {
+    discardAllPending()
     setEditExperienceId(exp.id)
     setEditData({
       company: exp.company,
@@ -158,6 +155,7 @@ export default function AdminExperiencePage() {
       setExperiences((prev) =>
         prev.map((exp) => (exp.id === id ? updated : exp))
       )
+      settlePending(updated.logoUrl)
       setEditExperienceId(null)
     } catch (err) {
       console.error('Update failed:', err)
@@ -233,6 +231,7 @@ export default function AdminExperiencePage() {
       if (!res.ok) throw new Error('Failed to add experience')
       const created = await res.json()
       setExperiences((prev) => [...prev, created])
+      settlePending(created.logoUrl)
       setShowNewForm(false)
       setNewExperience({
         company: '',
@@ -256,7 +255,13 @@ export default function AdminExperiencePage() {
 
       {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
       <button
-        onClick={() => setShowNewForm((prev) => !prev)}
+        onClick={() => {
+          if (showNewForm) {
+            discardAllPending()
+            setNewExperience((prev) => ({ ...prev, logoUrl: '' }))
+          }
+          setShowNewForm((prev) => !prev)
+        }}
         style={{
           padding: '0.5rem 1rem',
           backgroundColor: '#0070f3',
@@ -308,11 +313,14 @@ export default function AdminExperiencePage() {
             required
             style={{ display: 'block', marginBottom: '0.5rem', width: '100%' }}
           />
-          <LogoUrlField
+          <LogoUploadField
             id="new-experience-logo"
             value={newExperience.logoUrl}
             company={newExperience.company}
-            onChange={handleNewChange}
+            onChange={(url) =>
+              setNewExperience((prev) => ({ ...prev, logoUrl: url }))
+            }
+            {...logoFieldHandlers}
           />
           <label
             className="admin-field-label"
@@ -423,11 +431,14 @@ export default function AdminExperiencePage() {
                       marginBottom: '0.5rem',
                     }}
                   />
-                  <LogoUrlField
+                  <LogoUploadField
                     id={`experience-${exp.id}-logo`}
                     value={editData.logoUrl}
                     company={editData.company}
-                    onChange={handleEditChange}
+                    onChange={(url) =>
+                      setEditData((prev) => ({ ...prev, logoUrl: url }))
+                    }
+                    {...logoFieldHandlers}
                   />
                   <RichTextEditor
                     key={`edit-experience-${exp.id}`}
@@ -447,7 +458,12 @@ export default function AdminExperiencePage() {
                     >
                       Save
                     </button>
-                    <button onClick={() => setEditExperienceId(null)}>
+                    <button
+                      onClick={() => {
+                        discardAllPending()
+                        setEditExperienceId(null)
+                      }}
+                    >
                       Cancel
                     </button>
                   </div>

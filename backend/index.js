@@ -12,6 +12,7 @@ import adminMessageRoutes from './routes/admin/messages.js'
 import aboutRoutes from './routes/about.js'
 import adminAboutRoutes from './routes/admin/about.js'
 import adminSeedRoutes from './routes/admin/seed.js'
+import adminUploadRoutes from './routes/admin/uploads.js'
 import chatbotContextRoutes from './routes/chatbot_context_api.js'
 
 import dotenv from 'dotenv'
@@ -44,7 +45,16 @@ app.use('/api/admin/messages', adminMessageRoutes)
 app.use('/api/about', aboutRoutes)
 app.use('/api/admin/about', adminAboutRoutes)
 app.use('/api/admin/seed', adminSeedRoutes)
+app.use('/api/admin/uploads', adminUploadRoutes)
 app.use('/api', chatbotContextRoutes)
+
+// Oversized request bodies (e.g. a logo upload over 1 MB) -> JSON 413
+app.use((err, req, res, next) => {
+  if (err?.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'File is too large. The maximum size is 1 MB.' })
+  }
+  next(err)
+})
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`)

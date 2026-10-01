@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client'
 import verifyToken from '../middleware/verifyToken.js'
 import { sanitizeRichText } from '../utils/richText.js'
 import { parseOptionalImageUrl } from '../utils/imageUrl.js'
+import { deleteManagedObject, managedObjectPath } from '../utils/storage.js'
+import { EXPERIENCE_LOGO_FOLDER } from './admin/uploads.js'
 import {
   DISPLAY_ORDER,
   applyDisplayOrder,
@@ -13,6 +15,22 @@ import {
 
 const prisma = new PrismaClient()
 const router = express.Router()
+
+/*
+ * Best-effort removal of a previous logo file from Supabase Storage after
+ * the database no longer references it. Never fails the request: an
+ * orphaned file is harmless, a failed save is not.
+ */
+async function removeUnusedLogo(url) {
+  if (!managedObjectPath(url, EXPERIENCE_LOGO_FOLDER)) return
+
+  try {
+    const references = await prisma.experience.count({ where: { logoUrl: url } })
+    if (references === 0) await deleteManagedObject(url, EXPERIENCE_LOGO_FOLDER)
+  } catch (err) {
+    console.error('Could not remove previous experience logo:', err)
+  }
+}
 
 router.use(verifyToken)
 
@@ -79,6 +97,14 @@ router.put('/:id', async (req, res) => {
   if (logo.error) return res.status(400).json({ error: logo.error })
 
   try {
+    const previous =
+      logo.value === undefined
+        ? null
+        : await prisma.experience.findUnique({
+            where: { id: parseInt(id) },
+            select: { logoUrl: true },
+          })
+
     const updated = await prisma.experience.update({
       where: { id: parseInt(id) },
       data: {
@@ -91,6 +117,12 @@ router.put('/:id', async (req, res) => {
         logoUrl: logo.value,
       },
     })
+
+    // Logo replaced or removed: delete the old file if it was ours
+    if (previous?.logoUrl && previous.logoUrl !== updated.logoUrl) {
+      await removeUnusedLogo(previous.logoUrl)
+    }
+
     res.json(updated)
   } catch (err) {
     console.error('Failed to update experience:', err)
@@ -102,7 +134,12 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const { id } = req.params
   try {
-    await prisma.experience.delete({ where: { id: parseInt(id) } })
+    const deleted = await prisma.experience.delete({
+      where: { id: parseInt(id) },
+    })
+
+    if (deleted.logoUrl) await removeUnusedLogo(deleted.logoUrl)
+
     res.json({ message: 'Experience deleted successfully' })
   } catch (err) {
     console.error('Failed to delete experience:', err)
