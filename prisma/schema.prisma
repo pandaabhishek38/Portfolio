@@ -31,6 +31,8 @@ model Experience {
   description  String // Sanitized rich-text HTML, or legacy newline-separated plain text
   displayOrder Int     @default(0)
   logoUrl      String? // Optional company/organization logo (https URL or site path)
+  logoShape    String  @default("square") // Logo tile shape: "square" (rounded) | "circle"
+  logoZoom     Int     @default(100) // Logo scale inside the tile, percent (50-200)
 }
 
 model ContactItem {

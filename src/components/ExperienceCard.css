@@ -38,6 +38,10 @@
 }
 
 .experience-card__content {
+  /* Logo tile size + gap: shared by the header and the indented body */
+  --experience-card-logo-size: 72px;
+  --experience-card-logo-gap: 20px;
+
   display: flex;
   flex-direction: column;
 
@@ -49,8 +53,6 @@
    ========================================================= */
 
 .experience-card__header {
-  --experience-card-logo-gap: 18px;
-
   display: flex;
   align-items: flex-start;
   gap: var(--experience-card-logo-gap);
@@ -65,7 +67,9 @@
 
 /* Description + View More align with the text column beside the logo */
 .experience-card__body {
-  padding-left: calc(52px + 18px);
+  padding-left: calc(
+    var(--experience-card-logo-size) + var(--experience-card-logo-gap)
+  );
 }
 
 .experience-card__meta {
@@ -212,6 +216,9 @@
 
 @media (max-width: 900px) {
   .experience-card__content {
+    --experience-card-logo-size: 64px;
+    --experience-card-logo-gap: 18px;
+
     padding: 26px;
   }
 
@@ -221,10 +228,6 @@
 }
 
 @media (max-width: 600px) {
-  .experience-card__header {
-    gap: 14px;
-  }
-
   .experience-card__body {
     padding-left: 0;
   }
@@ -234,6 +237,9 @@
   }
 
   .experience-card__content {
+    --experience-card-logo-size: 52px;
+    --experience-card-logo-gap: 14px;
+
     padding: 22px;
   }
 

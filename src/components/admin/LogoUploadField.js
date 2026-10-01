@@ -1,7 +1,17 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { MdZoomIn, MdZoomOut } from 'react-icons/md'
 import ExperienceLogo from '../ExperienceLogo'
+import {
+  LOGO_SHAPES,
+  LOGO_ZOOM_DEFAULT,
+  LOGO_ZOOM_MAX,
+  LOGO_ZOOM_MIN,
+  LOGO_ZOOM_STEP,
+  normalizeLogoShape,
+  normalizeLogoZoom,
+} from '../../utils/logoDisplay'
 
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp']
 const MAX_BYTES = 1024 * 1024 // 1 MB, same as the backend and bucket
@@ -31,6 +41,11 @@ async function readDimensions(file) {
  * - onUploaded(url)      a new, not-yet-saved upload exists
  * - onDiscard(url)       a URL is no longer used by this form
  * - onSessionExpired()   the admin token was rejected
+ * - shape / onShapeChange(shape)  'square' | 'circle' (tile shape)
+ * - zoom / onZoomChange(zoom)     50-200 (%), scales the logo in the tile
+ *
+ * Shape and zoom are independent of the file: uploading or replacing a
+ * logo keeps them, and the preview reflects them immediately.
  */
 export default function LogoUploadField({
   id,
@@ -40,12 +55,18 @@ export default function LogoUploadField({
   onUploaded,
   onDiscard,
   onSessionExpired,
+  shape,
+  zoom,
+  onShapeChange,
+  onZoomChange,
 }) {
   const inputRef = useRef(null)
   const [status, setStatus] = useState({ type: 'idle', message: '' })
   const uploading = status.type === 'uploading'
 
   const isLegacyValue = Boolean(value) && !value.includes(STORAGE_PATH)
+  const tileShape = normalizeLogoShape(shape)
+  const zoomValue = normalizeLogoZoom(zoom)
 
   const handleFile = async (e) => {
     const file = e.target.files?.[0]
@@ -149,42 +170,131 @@ export default function LogoUploadField({
       </span>
 
       <div className="admin-logo-field__row">
-        <ExperienceLogo logoUrl={value} company={company} />
+        <ExperienceLogo
+          size="lg"
+          logoUrl={value}
+          company={company}
+          shape={tileShape}
+          zoom={zoomValue}
+        />
 
-        <div className="admin-logo-field__actions">
-          <input
-            ref={inputRef}
-            id={id}
-            type="file"
-            accept={ACCEPTED_TYPES.join(',')}
-            onChange={handleFile}
-            hidden
-          />
+        <div className="admin-logo-field__controls">
+          <div className="admin-logo-field__actions">
+            <input
+              ref={inputRef}
+              id={id}
+              type="file"
+              accept={ACCEPTED_TYPES.join(',')}
+              onChange={handleFile}
+              hidden
+            />
 
-          <button
-            type="button"
-            className="admin-logo-field__button admin-logo-field__button--primary"
-            onClick={() => inputRef.current?.click()}
-            disabled={uploading}
-            aria-describedby={`${id}-hint`}
-          >
-            {uploading
-              ? 'Uploading...'
-              : value
-                ? 'Replace logo'
-                : 'Upload logo'}
-          </button>
-
-          {value && (
             <button
               type="button"
-              className="admin-logo-field__button"
-              onClick={handleRemove}
+              className="admin-logo-field__button admin-logo-field__button--primary"
+              onClick={() => inputRef.current?.click()}
               disabled={uploading}
+              aria-describedby={`${id}-hint`}
             >
-              Remove
+              {uploading
+                ? 'Uploading...'
+                : value
+                  ? 'Replace logo'
+                  : 'Upload logo'}
             </button>
-          )}
+
+            {value && (
+              <button
+                type="button"
+                className="admin-logo-field__button"
+                onClick={handleRemove}
+                disabled={uploading}
+              >
+                Remove
+              </button>
+            )}
+          </div>
+
+          <div className="admin-logo-settings">
+            <fieldset className="admin-logo-settings__group">
+              <legend className="admin-logo-settings__label">Logo Shape</legend>
+              <div className="admin-segmented">
+                {LOGO_SHAPES.map((option) => (
+                  <label
+                    key={option.value}
+                    className={`admin-segmented__option${
+                      tileShape === option.value ? ' is-selected' : ''
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      className="sr-only"
+                      name={`${id}-shape`}
+                      value={option.value}
+                      checked={tileShape === option.value}
+                      onChange={() => onShapeChange?.(option.value)}
+                    />
+                    <span
+                      className={`admin-segmented__swatch admin-segmented__swatch--${option.value}`}
+                      aria-hidden="true"
+                    />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <div className="admin-logo-settings__group">
+              <label
+                className="admin-logo-settings__label"
+                htmlFor={`${id}-zoom`}
+              >
+                Logo Zoom
+              </label>
+              <div className="admin-logo-zoom">
+                <MdZoomOut
+                  className="admin-logo-zoom__icon"
+                  aria-hidden="true"
+                />
+                <input
+                  id={`${id}-zoom`}
+                  type="range"
+                  className="admin-logo-zoom__slider"
+                  min={LOGO_ZOOM_MIN}
+                  max={LOGO_ZOOM_MAX}
+                  step={LOGO_ZOOM_STEP}
+                  value={zoomValue}
+                  onChange={(e) => onZoomChange?.(Number(e.target.value))}
+                  disabled={!value}
+                  aria-valuetext={`${zoomValue}%`}
+                  aria-describedby={`${id}-zoom-hint`}
+                />
+                <MdZoomIn
+                  className="admin-logo-zoom__icon"
+                  aria-hidden="true"
+                />
+                <output
+                  className="admin-logo-zoom__value"
+                  htmlFor={`${id}-zoom`}
+                >
+                  {zoomValue}%
+                </output>
+                <button
+                  type="button"
+                  className="admin-logo-zoom__reset"
+                  onClick={() => onZoomChange?.(LOGO_ZOOM_DEFAULT)}
+                  disabled={!value || zoomValue === LOGO_ZOOM_DEFAULT}
+                >
+                  Reset
+                </button>
+              </div>
+              <span id={`${id}-zoom-hint`} className="admin-logo-zoom__hint">
+                {value
+                  ? 'Left zooms out, right zooms in.'
+                  : 'Upload a logo to adjust its zoom.'}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

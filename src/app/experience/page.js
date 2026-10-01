@@ -106,6 +106,8 @@ export default function ExperiencePage() {
                 period={exp.period}
                 description={exp.description}
                 logoUrl={exp.logoUrl}
+                logoShape={exp.logoShape}
+                logoZoom={exp.logoZoom}
               />
             </li>
           ))}

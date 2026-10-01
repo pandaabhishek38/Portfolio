@@ -1,7 +1,8 @@
 /* =========================================================
    EXPERIENCE LOGO
-   Rounded-square tile (matches the card radius language).
-   Fixed size so a loading/broken image never shifts layout.
+   Rounded-square (default) or circular tile, fixed size so a
+   loading/broken image, shape or zoom never shifts layout.
+   Zoom scales the image inside the tile; the tile clips it.
    ========================================================= */
 
 .experience-logo {
@@ -28,6 +29,19 @@
   border-radius: 10px;
 }
 
+/* Public Experience card size: follows the card's responsive
+   --experience-card-logo-size (72 / 64 / 52px); 72px elsewhere
+   (e.g. the admin preview). Radius and padding scale with it. */
+.experience-logo--lg {
+  --experience-logo-size: var(--experience-card-logo-size, 72px);
+
+  border-radius: calc(var(--experience-logo-size) * 0.22);
+}
+
+.experience-logo--lg.experience-logo--image {
+  padding: calc(var(--experience-logo-size) * 0.11);
+}
+
 /* Real logo: light neutral tile so dark, colorful and transparent
    logos all stay legible on the dark card. */
 .experience-logo--image {
@@ -47,6 +61,10 @@
 
   object-fit: contain;
   object-position: center;
+
+  /* 0.5 = zoomed out (smaller), 2 = zoomed in (crops at the tile edge) */
+  transform: scale(var(--experience-logo-zoom, 1));
+  transform-origin: center;
 }
 
 /* Fallback monogram */
@@ -69,4 +87,9 @@
 
     border-radius: 10px;
   }
+}
+
+/* Circle wins over the size-specific radii above (incl. mobile) */
+.experience-logo.experience-logo--circle {
+  border-radius: 50%;
 }

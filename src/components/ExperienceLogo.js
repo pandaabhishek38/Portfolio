@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { normalizeLogoShape, normalizeLogoZoom } from '../utils/logoDisplay'
 import './ExperienceLogo.css'
 
 /**
@@ -37,17 +38,30 @@ export function safeLogoSrc(url) {
 /**
  * Compact company logo tile. Renders the configured logo when it loads,
  * otherwise a subtle monogram. Fixed size, so no layout shift either way.
+ *
+ * shape: 'square' (rounded) | 'circle' - clips the whole tile
+ * zoom:  50-200 (%) - scales the logo inside the tile; the monogram is
+ *        never zoomed. Missing/invalid values fall back to square / 100.
  */
-export default function ExperienceLogo({ logoUrl, company, size = 'md' }) {
+export default function ExperienceLogo({
+  logoUrl,
+  company,
+  size = 'md',
+  shape,
+  zoom,
+}) {
   const src = safeLogoSrc(logoUrl)
   const [failedSrc, setFailedSrc] = useState(null)
   const showImage = Boolean(src) && failedSrc !== src
+  const tileShape = normalizeLogoShape(shape)
+  const scale = normalizeLogoZoom(zoom) / 100
 
   return (
     <div
-      className={`experience-logo experience-logo--${size} ${
+      className={`experience-logo experience-logo--${size} experience-logo--${tileShape} ${
         showImage ? 'experience-logo--image' : 'experience-logo--monogram'
       }`}
+      style={showImage ? { '--experience-logo-zoom': scale } : undefined}
     >
       {showImage ? (
         <Image

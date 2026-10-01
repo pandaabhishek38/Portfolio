@@ -8,6 +8,7 @@ body:has(.projects-page) {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  box-sizing: border-box; /* padding inside the 100% width: no sideways scroll */
   padding: 5rem 2rem 6rem;
 
   color: #f5f5f5;

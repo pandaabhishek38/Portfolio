@@ -1,12 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import RichText from './RichText'
-import {
-  countUnits,
-  parseRichText,
-  truncateBlocks,
-} from '../utils/richText'
+import { parseRichText, truncateBlocks } from '../utils/richText'
 import TechBadge, { parseTechStack } from './TechBadge'
 import './ProjectCard.css'
 
@@ -15,13 +10,11 @@ export default function ProjectCard({
   techStack,
   description,
   githubLink,
+  onViewDetails,
 }) {
-  const [expanded, setExpanded] = useState(false)
-
   const technologies = parseTechStack(techStack)
   // Rich-text HTML, or legacy newline-separated text shown as bullets
   const descriptionBlocks = parseRichText(description, { legacy: 'list' })
-  const descriptionUnits = countUnits(descriptionBlocks)
 
   const visibleTechnologies = technologies.slice(0, 9)
   const remainingTechnologies = Math.max(
@@ -29,16 +22,11 @@ export default function ProjectCard({
     0
   )
 
-  const visibleDescription = expanded
-    ? descriptionBlocks
-    : truncateBlocks(descriptionBlocks, 2)
-
-  const hasMoreDescription = descriptionUnits > 2
+  // Cards always show a short preview; the full details open in a modal.
+  const visibleDescription = truncateBlocks(descriptionBlocks, 2)
 
   return (
-    <article
-      className={`project-card${expanded ? ' project-card--expanded' : ''}`}
-    >
+    <article className="project-card">
       <div className="project-card__content">
         {/* Header */}
         <div className="project-card__header">
@@ -82,14 +70,15 @@ export default function ProjectCard({
         {/* Footer */}
         <div className="project-card__footer">
           <div className="project-card__footer-left">
-            {hasMoreDescription && (
+            {onViewDetails && (
               <button
                 type="button"
                 className="project-card__toggle"
-                onClick={() => setExpanded((prev) => !prev)}
-                aria-expanded={expanded}
+                onClick={onViewDetails}
+                aria-haspopup="dialog"
+                aria-label={`View details for ${title}`}
               >
-                {expanded ? 'View Less' : 'View More'}
+                View Details
               </button>
             )}
           </div>

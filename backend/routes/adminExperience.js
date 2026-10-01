@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import verifyToken from '../middleware/verifyToken.js'
 import { sanitizeRichText } from '../utils/richText.js'
 import { parseOptionalImageUrl } from '../utils/imageUrl.js'
+import { parseLogoShape, parseLogoZoom } from '../utils/logoDisplay.js'
 import { deleteManagedObject, managedObjectPath } from '../utils/storage.js'
 import { EXPERIENCE_LOGO_FOLDER } from './admin/uploads.js'
 import {
@@ -39,6 +40,10 @@ router.post('/', async (req, res) => {
   const { company, role, period, location, description } = req.body
   const logo = parseOptionalImageUrl(req.body.logoUrl)
   if (logo.error) return res.status(400).json({ error: logo.error })
+  const logoShape = parseLogoShape(req.body.logoShape)
+  if (logoShape.error) return res.status(400).json({ error: logoShape.error })
+  const logoZoom = parseLogoZoom(req.body.logoZoom)
+  if (logoZoom.error) return res.status(400).json({ error: logoZoom.error })
 
   try {
     const displayOrder = await nextDisplayOrder(prisma.experience)
@@ -50,6 +55,8 @@ router.post('/', async (req, res) => {
         location,
         description: sanitizeRichText(description),
         logoUrl: logo.value ?? null,
+        logoShape: logoShape.value,
+        logoZoom: logoZoom.value,
         displayOrder,
       },
     })
@@ -95,6 +102,10 @@ router.put('/:id', async (req, res) => {
   const { id } = req.params
   const logo = parseOptionalImageUrl(req.body.logoUrl)
   if (logo.error) return res.status(400).json({ error: logo.error })
+  const logoShape = parseLogoShape(req.body.logoShape)
+  if (logoShape.error) return res.status(400).json({ error: logoShape.error })
+  const logoZoom = parseLogoZoom(req.body.logoZoom)
+  if (logoZoom.error) return res.status(400).json({ error: logoZoom.error })
 
   try {
     const previous =
@@ -115,6 +126,8 @@ router.put('/:id', async (req, res) => {
         description:
           description === undefined ? undefined : sanitizeRichText(description),
         logoUrl: logo.value,
+        logoShape: logoShape.value,
+        logoZoom: logoZoom.value,
       },
     })
 

@@ -16,6 +16,8 @@ export default function ExperienceCard({
   period,
   description,
   logoUrl,
+  logoShape,
+  logoZoom,
 }) {
   const [expanded, setExpanded] = useState(false)
 
@@ -37,7 +39,13 @@ export default function ExperienceCard({
       <div className="experience-card__content">
         {/* Header: logo (or monogram) beside period, role and company */}
         <div className="experience-card__header">
-          <ExperienceLogo logoUrl={logoUrl} company={company} />
+          <ExperienceLogo
+            size="lg"
+            logoUrl={logoUrl}
+            company={company}
+            shape={logoShape}
+            zoom={logoZoom}
+          />
 
           <div className="experience-card__heading">
             {(period || isCurrent) && (

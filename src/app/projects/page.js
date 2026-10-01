@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import ProjectCard from '../../components/ProjectCard'
+import ProjectDetailsModal from '../../components/ProjectDetailsModal'
 import { sortByDisplayOrder } from '../../utils/fetchJson'
 import PageHeader from '../../components/PageHeader'
 import './ProjectsPage.css'
@@ -10,6 +11,8 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  // The one project shown in the details modal (null = closed)
+  const [selectedProject, setSelectedProject] = useState(null)
 
   useEffect(() => {
     const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -102,10 +105,17 @@ export default function ProjectsPage() {
               techStack={project.stack}
               description={project.description}
               githubLink={project.github}
+              onViewDetails={() => setSelectedProject(project)}
             />
           ))}
         </div>
       )}
+
+      <ProjectDetailsModal
+        key={selectedProject?.id ?? 'closed'}
+        project={selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
     </main>
   )
 }

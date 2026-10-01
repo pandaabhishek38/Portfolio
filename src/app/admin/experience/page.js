@@ -12,6 +12,11 @@ import useOrderSaver, {
   moveItem,
 } from '../../../components/admin/useOrderSaver'
 import { sortByDisplayOrder } from '../../../utils/fetchJson'
+import {
+  LOGO_ZOOM_DEFAULT,
+  normalizeLogoShape,
+  normalizeLogoZoom,
+} from '../../../utils/logoDisplay'
 import '../../../components/admin/AdminUI.css'
 
 const LOGO_URL_ERROR =
@@ -35,6 +40,8 @@ export default function AdminExperiencePage() {
     location: '',
     description: '',
     logoUrl: '',
+    logoShape: 'square',
+    logoZoom: LOGO_ZOOM_DEFAULT,
   })
 
   const [showNewForm, setShowNewForm] = useState(false)
@@ -45,6 +52,8 @@ export default function AdminExperiencePage() {
     location: '',
     description: '',
     logoUrl: '',
+    logoShape: 'square',
+    logoZoom: LOGO_ZOOM_DEFAULT,
   })
 
   const { saving, status, saveOrder } = useOrderSaver()
@@ -124,6 +133,8 @@ export default function AdminExperiencePage() {
       location: exp.location,
       description: exp.description,
       logoUrl: exp.logoUrl || '',
+      logoShape: normalizeLogoShape(exp.logoShape),
+      logoZoom: normalizeLogoZoom(exp.logoZoom),
     })
   }
 
@@ -240,6 +251,8 @@ export default function AdminExperiencePage() {
         location: '',
         description: '',
         logoUrl: '',
+        logoShape: 'square',
+        logoZoom: LOGO_ZOOM_DEFAULT,
       })
     } catch (err) {
       console.error('Failed to add experience:', err)
@@ -317,6 +330,14 @@ export default function AdminExperiencePage() {
             id="new-experience-logo"
             value={newExperience.logoUrl}
             company={newExperience.company}
+            shape={newExperience.logoShape}
+            zoom={newExperience.logoZoom}
+            onShapeChange={(logoShape) =>
+              setNewExperience((prev) => ({ ...prev, logoShape }))
+            }
+            onZoomChange={(logoZoom) =>
+              setNewExperience((prev) => ({ ...prev, logoZoom }))
+            }
             onChange={(url) =>
               setNewExperience((prev) => ({ ...prev, logoUrl: url }))
             }
@@ -435,6 +456,14 @@ export default function AdminExperiencePage() {
                     id={`experience-${exp.id}-logo`}
                     value={editData.logoUrl}
                     company={editData.company}
+                    shape={editData.logoShape}
+                    zoom={editData.logoZoom}
+                    onShapeChange={(logoShape) =>
+                      setEditData((prev) => ({ ...prev, logoShape }))
+                    }
+                    onZoomChange={(logoZoom) =>
+                      setEditData((prev) => ({ ...prev, logoZoom }))
+                    }
                     onChange={(url) =>
                       setEditData((prev) => ({ ...prev, logoUrl: url }))
                     }
@@ -474,6 +503,8 @@ export default function AdminExperiencePage() {
                     <ExperienceLogo
                       logoUrl={exp.logoUrl}
                       company={exp.company}
+                      shape={exp.logoShape}
+                      zoom={exp.logoZoom}
                       size="sm"
                     />
                     <strong style={{ fontSize: '1.2rem', color: '#111' }}>

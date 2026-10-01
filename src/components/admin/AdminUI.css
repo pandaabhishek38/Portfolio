@@ -121,8 +121,157 @@
 
 .admin-logo-field__row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.admin-logo-field__controls {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
+
+  min-width: 0;
+}
+
+/* Logo Shape + Logo Zoom (compact, beside the preview) */
+.admin-logo-settings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 22px;
+}
+
+.admin-logo-settings__group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+}
+
+.admin-logo-settings__label {
+  padding: 0;
+
+  color: #444;
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.admin-segmented {
+  display: inline-flex;
+
+  border: 1px solid #c8c8c8;
+  border-radius: 7px;
+
+  overflow: hidden;
+}
+
+.admin-segmented__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 5px 10px;
+
+  background: #ffffff;
+  color: #333;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.admin-segmented__option + .admin-segmented__option {
+  border-left: 1px solid #c8c8c8;
+}
+
+.admin-segmented__option.is-selected {
+  background: #dbe9ff;
+  color: #0059c1;
+}
+
+.admin-segmented__option:has(input:focus-visible) {
+  outline: 2px solid #0070f3;
+  outline-offset: -2px;
+}
+
+.admin-segmented__swatch {
+  width: 12px;
+  height: 12px;
+
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+}
+
+.admin-segmented__swatch--circle {
+  border-radius: 50%;
+}
+
+.admin-logo-zoom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-logo-zoom__icon {
+  flex-shrink: 0;
+
+  color: #555;
+
+  font-size: 18px;
+}
+
+.admin-logo-zoom__slider {
+  width: 150px;
+
+  accent-color: #0070f3;
+}
+
+.admin-logo-zoom__value {
+  min-width: 3.2em;
+
+  color: #222;
+
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.admin-logo-zoom__reset {
+  padding: 3px 8px;
+
+  border: 1px solid #c8c8c8;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #333;
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.admin-logo-zoom__reset:disabled,
+.admin-logo-zoom__slider:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+.admin-logo-zoom__hint {
+  color: #777;
+
+  font-size: 12px;
 }
 
 .admin-logo-field__actions {
