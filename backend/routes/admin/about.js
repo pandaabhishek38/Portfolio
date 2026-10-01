@@ -3,6 +3,7 @@ import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import verifyToken from '../../middleware/verifyToken.js'
 import { sanitizeRichText } from '../../utils/richText.js'
+import { parseHomeFeature, parseId } from '../../utils/homeFeature.js'
 import {
   applyDisplayOrder,
   getOrderedSkills,
@@ -155,6 +156,27 @@ router.put('/skills/order', verifyToken, async (req, res) => {
   } catch (err) {
     console.error('Failed to reorder skills:', err)
     res.status(500).json({ error: 'Failed to save skill order' })
+  }
+})
+
+// UPDATE skill Home settings: { featuredOnHome?, homeDisplayOrder? }
+// Independent of the Skills-page category/skill order.
+router.put('/skills/:id/home', verifyToken, async (req, res) => {
+  const id = parseId(req.params.id)
+  if (!id) return res.status(400).json({ error: 'Invalid skill id' })
+
+  const { data, error } = parseHomeFeature(req.body)
+  if (error) return res.status(400).json({ error })
+
+  try {
+    const updated = await prisma.skill.update({ where: { id }, data })
+    res.json(updated)
+  } catch (err) {
+    if (err?.code === 'P2025') {
+      return res.status(404).json({ error: 'Skill not found' })
+    }
+    console.error('Failed to update skill Home settings:', err)
+    res.status(500).json({ error: 'Failed to save Home settings' })
   }
 })
 

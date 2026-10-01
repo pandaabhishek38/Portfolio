@@ -26,16 +26,11 @@ export default function HomePage() {
     <main className="home-page">
       <section className="home-hero" aria-labelledby="home-hero-title">
         <div className="home-hero__content">
-          <span className="home-hero__eyebrow">SOFTWARE ENGINEER</span>
-
           <h1 id="home-hero-title" className="home-hero__title">
             Abhishek Panda
           </h1>
 
-          <p className="home-hero__lead">
-            I build full-stack web applications and put machine learning into
-            production.
-          </p>
+          <p className="home-hero__role">Software Engineer</p>
 
           <div className="home-hero__actions">
             <Link href="/projects" className="ui-button ui-button--primary">
@@ -79,9 +74,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <FeaturedProjects />
-
       <ExperienceSnapshot />
+
+      <FeaturedProjects />
 
       <ToolkitStrip />
 

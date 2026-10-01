@@ -14,12 +14,14 @@ datasource db {
 }
 
 model Project {
-  id           Int    @id @default(autoincrement())
-  title        String
-  stack        String
-  github       String
-  description  String // Sanitized rich-text HTML, or legacy newline-separated plain text
-  displayOrder Int    @default(0)
+  id               Int     @id @default(autoincrement())
+  title            String
+  stack            String
+  github           String
+  description      String // Sanitized rich-text HTML, or legacy newline-separated plain text
+  displayOrder     Int     @default(0)
+  featuredOnHome   Boolean @default(false) // shown in Home "Featured projects"
+  homeDisplayOrder Int     @default(0) // order on Home only (independent of displayOrder)
 }
 
 model Experience {
@@ -66,10 +68,12 @@ model Education {
 }
 
 model Skill {
-  id           Int    @id @default(autoincrement())
-  name         String
-  type         String // e.g., Language, Framework, Tool
-  displayOrder Int    @default(0) // order within its type
+  id               Int     @id @default(autoincrement())
+  name             String
+  type             String // e.g., Language, Framework, Tool
+  displayOrder     Int     @default(0) // order within its type
+  featuredOnHome   Boolean @default(false) // shown in Home "Technologies I work with"
+  homeDisplayOrder Int     @default(0) // order on Home only (independent of type/displayOrder)
 }
 
 // Display order of skill categories (Skill.type values) on the About page.

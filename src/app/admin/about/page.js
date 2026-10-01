@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import RichText from '../../../components/RichText'
 import RichTextEditor from '../../../components/admin/RichTextEditor'
 import ReorderButtons from '../../../components/admin/ReorderButtons'
+import HomeFeatureControls, {
+  HomeFeaturedSummary,
+  nextHomeOrder,
+} from '../../../components/admin/HomeFeatureControls'
 import useOrderSaver, {
   OrderStatus,
   moveItem,
@@ -592,11 +596,19 @@ export default function AdminAboutPage() {
       <section className="admin-section">
         <h2>Skills</h2>
         <p className="admin-hint">
-          Categories and the skills inside them appear on the About page in
-          this order.
+          Categories and the skills inside them appear on the About page in this
+          order.
         </p>
 
         <OrderStatus status={status} saving={saving} />
+
+        <HomeFeaturedSummary
+          items={skills}
+          getName={(skill) => skill.name}
+          limit={12}
+          noun="skills"
+          section="Technologies I work with"
+        />
 
         <datalist id="skill-type-options">
           {skillGroups.map((group) => (
@@ -650,16 +662,43 @@ export default function AdminAboutPage() {
                     </>
                   ) : (
                     <div className="admin-skill-row">
-                      <strong>{skill.name}</strong>
+                      <strong>
+                        {skill.name}
+                        {skill.featuredOnHome && (
+                          <span className="admin-featured-badge">
+                            Home #{skill.homeDisplayOrder}
+                          </span>
+                        )}
+                      </strong>
 
                       <ReorderButtons
                         index={skillIndex}
                         count={group.skills.length}
                         label={skill.name}
-                        onMove={(from, to) =>
-                          handleMoveSkill(group, from, to)
-                        }
+                        onMove={(from, to) => handleMoveSkill(group, from, to)}
                         disabled={saving}
+                      />
+
+                      <HomeFeatureControls
+                        id={`skill-${skill.id}-home-order`}
+                        label={skill.name}
+                        featured={skill.featuredOnHome}
+                        order={skill.homeDisplayOrder}
+                        suggestedOrder={nextHomeOrder(skills)}
+                        endpoint={`/api/admin/about/skills/${skill.id}/home`}
+                        onSaved={(updated) =>
+                          setSkills((prev) =>
+                            prev.map((s) =>
+                              s.id === updated.id
+                                ? {
+                                    ...s,
+                                    featuredOnHome: updated.featuredOnHome,
+                                    homeDisplayOrder: updated.homeDisplayOrder,
+                                  }
+                                : s
+                            )
+                          )
+                        }
                       />
 
                       <div className="button-row">

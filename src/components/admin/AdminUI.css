@@ -352,3 +352,96 @@
   align-items: center;
   gap: 10px;
 }
+
+/* Home featuring (Projects / Skills) */
+.admin-home-feature {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+
+  font-size: 13px;
+}
+
+.admin-home-feature__toggle,
+.admin-home-feature__order {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  color: #333;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.admin-home-feature__toggle input {
+  width: 16px;
+  height: 16px;
+
+  accent-color: #0070f3;
+}
+
+.admin-home-feature__order input {
+  width: 64px;
+  padding: 3px 6px;
+
+  border: 1px solid #b9b9b9;
+  border-radius: 6px;
+
+  font: inherit;
+  font-size: 13px;
+}
+
+.admin-home-feature__order input:disabled {
+  background: #f1f1f1;
+  color: #999;
+}
+
+.admin-home-feature__status {
+  min-width: 3.5em;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-home-feature__status--success {
+  color: #1e7e34;
+}
+
+.admin-home-feature__status--error {
+  color: #c62828;
+}
+
+.admin-featured-badge {
+  display: inline-flex;
+  align-items: center;
+
+  margin-left: 8px;
+  padding: 2px 8px;
+
+  border: 1px solid #b7e2c4;
+  border-radius: 999px;
+
+  background: #e6f6ec;
+  color: #1e7e34;
+
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.admin-home-summary {
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.8rem;
+
+  border-left: 3px solid #0070f3;
+  border-radius: 4px;
+
+  background: #f2f7ff;
+  color: #333;
+
+  font-size: 14px;
+  line-height: 1.5;
+}

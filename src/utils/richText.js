@@ -49,7 +49,13 @@ const DROPPED_TAGS = new Set([
   'link',
 ])
 
-const INLINE_MARKS = { strong: 'strong', b: 'strong', em: 'em', i: 'em', u: 'u' }
+const INLINE_MARKS = {
+  strong: 'strong',
+  b: 'strong',
+  em: 'em',
+  i: 'em',
+  u: 'u',
+}
 const HEADINGS = { h1: 'h3', h2: 'h3', h3: 'h3', h4: 'h4', h5: 'h4', h6: 'h4' }
 const CONTAINERS = new Set(['div', 'blockquote', 'section', 'article', 'body'])
 const SAFE_PROTOCOLS = new Set(['http', 'https', 'mailto', 'tel'])
@@ -252,11 +258,13 @@ export function parseRichText(value, { legacy = 'paragraphs' } = {}) {
     .filter(Boolean)
     .map((paragraph) => ({
       type: 'p',
-      children: paragraph.split(/\r?\n/).flatMap((line, index) =>
-        index === 0
-          ? [{ type: 'text', text: line }]
-          : [{ type: 'br' }, { type: 'text', text: line }]
-      ),
+      children: paragraph
+        .split(/\r?\n/)
+        .flatMap((line, index) =>
+          index === 0
+            ? [{ type: 'text', text: line }]
+            : [{ type: 'br' }, { type: 'text', text: line }]
+        ),
     }))
 }
 
@@ -302,6 +310,22 @@ function inlineToText(inline) {
     .join('')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+/** Plain text of all blocks (lists, paragraphs, nested lists). */
+export function blocksToText(blocks) {
+  return blocks
+    .map((block) =>
+      block.items
+        ? block.items
+            .map(
+              (item) =>
+                `${inlineToText(item.children)} ${blocksToText(item.lists)}`
+            )
+            .join(' ')
+        : inlineToText(block.children)
+    )
+    .join(' ')
 }
 
 /** Plain text of the first unit (e.g. for a compact preview). */

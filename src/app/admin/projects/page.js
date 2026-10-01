@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import RichText from '../../../components/RichText'
 import RichTextEditor from '../../../components/admin/RichTextEditor'
 import ReorderButtons from '../../../components/admin/ReorderButtons'
+import HomeFeatureControls, {
+  HomeFeaturedSummary,
+  nextHomeOrder,
+} from '../../../components/admin/HomeFeatureControls'
 import useOrderSaver, {
   OrderStatus,
   moveItem,
@@ -216,7 +220,10 @@ export default function AdminProjectsPage() {
             required
             style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
           />
-          <label className="admin-field-label" htmlFor="new-project-description">
+          <label
+            className="admin-field-label"
+            htmlFor="new-project-description"
+          >
             Description
           </label>
           <RichTextEditor
@@ -243,6 +250,14 @@ export default function AdminProjectsPage() {
 
       <OrderStatus status={status} saving={saving} />
 
+      <HomeFeaturedSummary
+        items={projects}
+        getName={(project) => project.title}
+        limit={3}
+        noun="projects"
+        section="Featured projects"
+      />
+
       {projects.length > 0 ? (
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {projects.map((project, index) => (
@@ -264,6 +279,28 @@ export default function AdminProjectsPage() {
                   label={project.title}
                   onMove={handleMove}
                   disabled={saving}
+                />
+
+                <HomeFeatureControls
+                  id={`project-${project.id}-home-order`}
+                  label={project.title}
+                  featured={project.featuredOnHome}
+                  order={project.homeDisplayOrder}
+                  suggestedOrder={nextHomeOrder(projects)}
+                  endpoint={`/api/admin/projects/${project.id}/home`}
+                  onSaved={(updated) =>
+                    setProjects((prev) =>
+                      prev.map((p) =>
+                        p.id === updated.id
+                          ? {
+                              ...p,
+                              featuredOnHome: updated.featuredOnHome,
+                              homeDisplayOrder: updated.homeDisplayOrder,
+                            }
+                          : p
+                      )
+                    )
+                  }
                 />
               </div>
 
@@ -320,6 +357,11 @@ export default function AdminProjectsPage() {
                   <strong style={{ fontSize: '1.2rem', color: '#111' }}>
                     {project.title}
                   </strong>
+                  {project.featuredOnHome && (
+                    <span className="admin-featured-badge">
+                      Featured · Home #{project.homeDisplayOrder}
+                    </span>
+                  )}
                   <p style={{ margin: '0.5rem 0', color: '#444' }}>
                     {project.stack}
                   </p>

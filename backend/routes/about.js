@@ -1,6 +1,7 @@
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import { getOrderedSkills } from '../utils/ordering.js'
+import { HOME_ORDER, wantsHomeFeatured } from '../utils/homeFeature.js'
 
 const router = express.Router()
 const prisma = new PrismaClient()
@@ -27,10 +28,16 @@ router.get('/education', async (req, res) => {
   }
 })
 
-// GET skills (category order, then order within category; adds typeOrder)
+// GET skills (category order, then order within category; adds typeOrder).
+// ?featured=home -> only skills featured on Home, in Home order.
 router.get('/skills', async (req, res) => {
   try {
-    const skills = await getOrderedSkills(prisma)
+    const skills = wantsHomeFeatured(req.query)
+      ? await prisma.skill.findMany({
+          where: { featuredOnHome: true },
+          orderBy: HOME_ORDER,
+        })
+      : await getOrderedSkills(prisma)
     res.json(skills)
   } catch (err) {
     console.error('❌ Failed to fetch skills:', err)

@@ -27,6 +27,24 @@ export function sortByDisplayOrder(rows) {
 }
 
 /**
+ * Sort Home-featured rows by their Home-only order (homeDisplayOrder),
+ * then id. Independent of the full-page displayOrder.
+ */
+export function sortByHomeOrder(rows) {
+  const homeValue = (row) =>
+    Number.isFinite(row?.homeDisplayOrder) ? row.homeDisplayOrder : 0
+  return [...rows].sort((a, b) => homeValue(a) - homeValue(b) || a.id - b.id)
+}
+
+/**
+ * Keep only rows featured on Home. Rows without the field (an older API
+ * that ignores ?featured=home) are kept so Home still renders.
+ */
+export function onlyHomeFeatured(rows) {
+  return rows.filter((row) => row?.featuredOnHome !== false)
+}
+
+/**
  * Sort skills by category order (typeOrder), then displayOrder, then id.
  * Without typeOrder (older API), categories keep first-appearance order.
  */
@@ -45,6 +63,8 @@ export function sortSkills(rows) {
 
   return byId.sort(
     (a, b) =>
-      typeValue(a) - typeValue(b) || orderValue(a) - orderValue(b) || a.id - b.id
+      typeValue(a) - typeValue(b) ||
+      orderValue(a) - orderValue(b) ||
+      a.id - b.id
   )
 }

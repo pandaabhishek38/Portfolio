@@ -2,6 +2,7 @@ import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import verifyToken from '../middleware/verifyToken.js'
 import { sanitizeRichText } from '../utils/richText.js'
+import { parseHomeFeature, parseId } from '../utils/homeFeature.js'
 import {
   DISPLAY_ORDER,
   applyDisplayOrder,
@@ -70,6 +71,27 @@ router.put('/order', async (req, res) => {
   } catch (err) {
     console.error('Failed to reorder projects:', err)
     res.status(500).json({ error: 'Failed to save project order' })
+  }
+})
+
+// PUT Home settings: { featuredOnHome?, homeDisplayOrder? }
+// Independent of the Projects-page order.
+router.put('/:id/home', async (req, res) => {
+  const id = parseId(req.params.id)
+  if (!id) return res.status(400).json({ error: 'Invalid project id' })
+
+  const { data, error } = parseHomeFeature(req.body)
+  if (error) return res.status(400).json({ error })
+
+  try {
+    const updated = await prisma.project.update({ where: { id }, data })
+    res.json(updated)
+  } catch (err) {
+    if (err?.code === 'P2025') {
+      return res.status(404).json({ error: 'Project not found' })
+    }
+    console.error('Failed to update project Home settings:', err)
+    res.status(500).json({ error: 'Failed to save Home settings' })
   }
 })
 

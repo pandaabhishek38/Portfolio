@@ -3,16 +3,17 @@
 import { FiArrowUpRight } from 'react-icons/fi'
 import TechBadge, { parseTechStack } from '../TechBadge'
 import { firstUnitText, parseRichText } from '../../utils/richText'
-import { sortByDisplayOrder } from '../../utils/fetchJson'
+import { onlyHomeFeatured, sortByHomeOrder } from '../../utils/fetchJson'
 import HomeSectionHeader from './HomeSectionHeader'
 import useOptionalList from './useOptionalList'
 
 const FEATURED_COUNT = 3
 const MAX_BADGES = 4
 
-// Same order as the Projects page (admin display order), first three.
+// Projects featured on Home (Admin -> Projects), in Home order, first three.
+// Independent of the Projects page order.
 const selectProjects = (rows) =>
-  sortByDisplayOrder(rows).slice(0, FEATURED_COUNT)
+  sortByHomeOrder(onlyHomeFeatured(rows)).slice(0, FEATURED_COUNT)
 
 function toExternalHref(link) {
   const trimmed = String(link || '').trim()
@@ -80,7 +81,10 @@ function ProjectPreview({ project }) {
 }
 
 export default function FeaturedProjects() {
-  const { status, items } = useOptionalList('/api/projects', selectProjects)
+  const { status, items } = useOptionalList(
+    '/api/projects?featured=home',
+    selectProjects
+  )
 
   if (status === 'hidden') return null
 

@@ -1,21 +1,21 @@
 'use client'
 
-import TechBadge, { hasTechMeta } from '../TechBadge'
-import { sortSkills } from '../../utils/fetchJson'
+import TechBadge from '../TechBadge'
+import { onlyHomeFeatured, sortByHomeOrder } from '../../utils/fetchJson'
 import HomeSectionHeader from './HomeSectionHeader'
 import useOptionalList from './useOptionalList'
 
 const TOOLKIT_COUNT = 12
 
 /*
- * Representative skills: de-duplicated by name, keeping the admin order,
- * with technologies that have a dedicated badge mark listed first.
+ * Skills featured on Home (Admin -> About -> Skills), in Home order,
+ * de-duplicated by name. Independent of the Skills page grouping/order.
  */
 const selectSkills = (rows) => {
   const seen = new Set()
   const unique = []
 
-  for (const skill of sortSkills(rows)) {
+  for (const skill of sortByHomeOrder(onlyHomeFeatured(rows))) {
     const name = String(skill?.name || '').trim()
     const key = name.toLowerCase()
 
@@ -25,16 +25,16 @@ const selectSkills = (rows) => {
     unique.push({ id: skill.id, name })
   }
 
-  const mapped = unique.filter((skill) => hasTechMeta(skill.name))
-  const unmapped = unique.filter((skill) => !hasTechMeta(skill.name))
-
-  return [...mapped, ...unmapped].slice(0, TOOLKIT_COUNT)
+  return unique.slice(0, TOOLKIT_COUNT)
 }
 
 const SKELETON_WIDTHS = [88, 72, 104, 64, 96, 80, 70, 92]
 
 export default function ToolkitStrip() {
-  const { status, items } = useOptionalList('/api/about/skills', selectSkills)
+  const { status, items } = useOptionalList(
+    '/api/about/skills?featured=home',
+    selectSkills
+  )
 
   if (status === 'hidden') return null
 
